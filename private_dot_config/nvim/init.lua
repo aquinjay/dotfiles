@@ -1,4 +1,4 @@
---require "personal.options"
+require "personal.options"
 --require "personal.keymaps"
 --require "personal.plugins"
 --require "personal.autocommands"
