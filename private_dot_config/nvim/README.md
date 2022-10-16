@@ -9,3 +9,5 @@ know what this configuration is for.
 ## Lua Directory
 
 Options is used to configre simple options for NVIM. Run the command: "help options" to learn more about possible options and details.
+
+Keymaps are used to remap defaults keybindings in neovim.

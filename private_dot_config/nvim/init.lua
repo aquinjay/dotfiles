@@ -1,5 +1,5 @@
 require "personal.options"
---require "personal.keymaps"
+require "personal.keymaps"
 --require "personal.plugins"
 --require "personal.autocommands"
 --require "personal.colorscheme"
