@@ -20,3 +20,4 @@ Optional is where lazy loaded plugins live. Note more lazy loading will not nece
 Plugin directory is made by Packer to manage plugins and compile them. Can delete but packer will re-create.
 See packer options to modify load.
 
+Can view messages using the message command.
