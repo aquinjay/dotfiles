@@ -40,7 +40,7 @@ pumheight = 10,                             -- pop up menu height
 title = true, -- set the title of window to the value of the titlestring
 signcolumn = "yes", -- always show the sign column, otherwise it would shift the text each time
 --showcmd = false, -- Hide last command
-
+--colorscheme = 'tokyonight-night',
 
 ------------------
 -- Tabs, Indent --
