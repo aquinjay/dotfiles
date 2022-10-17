@@ -10,4 +10,5 @@ know what this configuration is for.
 
 Options is used to configre simple options for NVIM. Run the command: "help options" to learn more about possible options and details.
 
-Keymaps are used to remap defaults keybindings in neovim.
+Keymaps are used to remap defaults keybindings in neovim. Note this specific file is idiosyncratic compared to how remaps are typically done. 
+Review contents in the file iteself before consulting external guides.
