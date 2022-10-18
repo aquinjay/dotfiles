@@ -21,3 +21,5 @@ Plugin directory is made by Packer to manage plugins and compile them. Can delet
 See packer options to modify load.
 
 Can view messages using the message command.
+
+Snippets and completions require extra configuration in cmp file.
