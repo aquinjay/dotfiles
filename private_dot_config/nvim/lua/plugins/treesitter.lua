@@ -41,4 +41,8 @@ configs.setup({
       -- Term colors here
     }
   },
+  context_commentstring = {
+    enable = true,
+    enable_autocmd = false,
+  },
 })

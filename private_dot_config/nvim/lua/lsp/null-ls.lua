@@ -1,3 +1,4 @@
+-- Look at builtins on github page for what languages this supports
 local null_ls_status_ok, null_ls = pcall(require, "null-ls")
 if not null_ls_status_ok then
 	return
@@ -13,7 +14,7 @@ null_ls.setup({
 	sources = {
 		formatting.prettier.with({ extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } }),
 		formatting.black.with({ extra_args = { "--fast" } }),
-		formatting.stylua,
+		formatting.stylua, -- add formatters and diagnositcs here
     -- diagnostics.flake8
 	},
 })

@@ -39,7 +39,7 @@ keymap("n", "<C-l>", "<C-w>l", opts)
 
 -- <cr> = carriage return = enter key
 --
-keymap("n", "<leader>e", ":Lex 30<cr>", opts) -- Opens File Explorer. 
+keymap("n", "<leader>e", ":CHADopen<cr>", opts) -- Opens File Explorer. 
 
 -- Resize windows with arrows 
 keymap("n", "<C-Up>", ":resize +2<CR>", opts)

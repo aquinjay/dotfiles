@@ -54,19 +54,20 @@ return packer.startup(function(use)
         } -- Have packer manage itself
   use "nvim-lua/plenary.nvim" -- Useful lua helper functions used by lots of plugins.
   use { "windwp/nvim-autopairs"} -- Autopairs, integrates with both cmp and treesitter
-  --use { "numToStr/Comment.nvim", commit = "97a188a98b5a3a6f9b1b850799ac078faa17ab67" }
-  --use { "JoosepAlviste/nvim-ts-context-commentstring", commit = "4d3a68c41a53add8804f471fcc49bb398fe8de08" }
-  --use { "kyazdani42/nvim-web-devicons", commit = "563f3635c2d8a7be7933b9e547f7c178ba0d4352" }
-  --use { "kyazdani42/nvim-tree.lua", commit = "7282f7de8aedf861fe0162a559fc2b214383c51c" }
-  --use { "akinsho/bufferline.nvim", commit = "83bf4dc7bff642e145c8b4547aa596803a8b4dc4" }
-	--use { "moll/vim-bbye", commit = "25ef93ac5a87526111f43e5110675032dbcacf56" }
-  --use { "nvim-lualine/lualine.nvim", commit = "a52f078026b27694d2290e34efa61a6e4a690621" }
-  --use { "akinsho/toggleterm.nvim", commit = "2a787c426ef00cb3488c11b14f5dcf892bbd0bda" }
+  use { "numToStr/Comment.nvim"} --Easily input regular comment. 
+  use { "JoosepAlviste/nvim-ts-context-commentstring"} -- Know which kind of comment string to use based on context of file
+  use {"ms-jpq/chadtree", branch = 'chad', run = 'python3 -m chadtree deps'}
+  use { "kyazdani42/nvim-web-devicons"}
+  --use { "kyazdani42/nvim-tree.lua", commit = "7282f7de8aedf861fe0162a559fc2b214383c51c" } -- repalced by chadtree
+  use { "akinsho/bufferline.nvim"}
+	use { "moll/vim-bbye"}
+  use { "nvim-lualine/lualine.nvim"}
+  use { "akinsho/toggleterm.nvim"}
   --use { "ahmedkhalf/project.nvim", commit = "628de7e433dd503e782831fe150bb750e56e55d6" }
-  --use { "lewis6991/impatient.nvim", commit = "b842e16ecc1a700f62adb9802f8355b99b52a5a6" }
+  use { "lewis6991/impatient.nvim"}
   --use { "lukas-reineke/indent-blankline.nvim", commit = "db7cbcb40cc00fc5d6074d7569fb37197705e7f6" }
   --use { "goolord/alpha-nvim", commit = "0bb6fc0646bcd1cdb4639737a1cee8d6e08bcc31" }
-	--use {"folke/which-key.nvim"}
+	use {"folke/which-key.nvim"}
 
 	-- Colorschemes
   use { "folke/tokyonight.nvim"}
@@ -88,7 +89,7 @@ return packer.startup(function(use)
 	use { "neovim/nvim-lspconfig"} -- enable LSP. Core Neovim
   use { "williamboman/mason.nvim"} -- simple to use language server installer, Next gen nvim-lsp-installer
   use { "williamboman/mason-lspconfig.nvim"}
-	use { "jose-elias-alvarez/null-ls.nvim"} -- for formatters and linters
+	use { "jose-elias-alvarez/null-ls.nvim"} -- for formatters and linters. Need to install binaries to get this to work. Linter = Fixer. 
   --use { "RRethy/vim-illuminate", commit = "a2e8476af3f3e993bb0d6477438aad3096512e42" }
 
 	-- Telescope
@@ -97,12 +98,11 @@ return packer.startup(function(use)
 
 	-- Treesitter
   use {'nvim-treesitter/nvim-treesitter', -- Syntax highlighting
-                run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
         }
   use {'p00f/nvim-ts-rainbow'} -- Can see where parenthasis start and end
 
 	-- Git
-	--use { "lewis6991/gitsigns.nvim", commit = "2c6f96dda47e55fa07052ce2e2141e8367cbaaf2" }
+	use { "lewis6991/gitsigns.nvim"} -- create git indicators in code and provide commands to navigate git 
 
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
