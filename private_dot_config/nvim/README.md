@@ -23,3 +23,13 @@ See packer options to modify load.
 Can view messages using the message command.
 
 Snippets and completions require extra configuration in cmp file.
+
+##LSP 
+
+Language server protocol. Use command LSP.. to manipulate LSP commands. Press i over server name to install the LSP.
+
+See handlers file to get a good understanding of Lua.
+
+## Treesitter
+
+Does dyntax highlighting.

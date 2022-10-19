@@ -5,7 +5,6 @@
 -- Plugin manager: packer.nvim
 -- url: https://github.com/wbthomason/packer.nvim
 
-
 local fn = vim.fn
 
 -- Auto install packer
@@ -78,25 +77,29 @@ return packer.startup(function(use)
   use { "hrsh7th/cmp-buffer"} -- buffer completions. Buffer is the message definition window that appears when you type
   use { "hrsh7th/cmp-path"} -- path completions
 	use { "saadparwaiz1/cmp_luasnip"} -- snippet completions. Snippets are the word completion windows that appear
-	use { "hrsh7th/cmp-nvim-lsp"}
-	use { "hrsh7th/cmp-nvim-lua"}
+	use { "hrsh7th/cmp-nvim-lsp"} -- LSP completions
+	use { "hrsh7th/cmp-nvim-lua"} -- Lua completions
 
 	-- Snippets
   use { "L3MON4D3/LuaSnip"} --snippet engine. For snip window above.
   use { "rafamadriz/friendly-snippets"} -- a bunch of snippets to use for many languages.
 
 	-- LSP
-	--use { "neovim/nvim-lspconfig", commit = "f11fdff7e8b5b415e5ef1837bdcdd37ea6764dda" } -- enable LSP
-  --use { "williamboman/mason.nvim", commit = "c2002d7a6b5a72ba02388548cfaf420b864fbc12"} -- simple to use language server installer
-  --use { "williamboman/mason-lspconfig.nvim", commit = "0051870dd728f4988110a1b2d47f4a4510213e31" }
-	--use { "jose-elias-alvarez/null-ls.nvim", commit = "c0c19f32b614b3921e17886c541c13a72748d450" } -- for formatters and linters
+	use { "neovim/nvim-lspconfig"} -- enable LSP. Core Neovim
+  use { "williamboman/mason.nvim"} -- simple to use language server installer, Next gen nvim-lsp-installer
+  use { "williamboman/mason-lspconfig.nvim"}
+	use { "jose-elias-alvarez/null-ls.nvim"} -- for formatters and linters
   --use { "RRethy/vim-illuminate", commit = "a2e8476af3f3e993bb0d6477438aad3096512e42" }
 
 	-- Telescope
-	--use { "nvim-telescope/telescope.nvim", commit = "76ea9a898d3307244dce3573392dcf2cc38f340f" }
+	use { "nvim-telescope/telescope.nvim", requires = { {'nvim-lua/plenary.nvim'} }
+  } -- Super powerfuls fuzzy finder
 
 	-- Treesitter
-	--use {"nvim-treesitter/nvim-treesitter",commit = "8e763332b7bf7b3a426fd8707b7f5aa85823a5ac",}
+  use {'nvim-treesitter/nvim-treesitter', -- Syntax highlighting
+                run = function() require('nvim-treesitter.install').update({ with_sync = true }) end,
+        }
+  use {'p00f/nvim-ts-rainbow'} -- Can see where parenthasis start and end
 
 	-- Git
 	--use { "lewis6991/gitsigns.nvim", commit = "2c6f96dda47e55fa07052ce2e2141e8367cbaaf2" }
