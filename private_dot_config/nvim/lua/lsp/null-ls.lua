@@ -9,12 +9,20 @@ local formatting = null_ls.builtins.formatting
 -- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins/diagnostics
 local diagnostics = null_ls.builtins.diagnostics
 
+local actions = null_ls.builtins.code_actions
+
 null_ls.setup({
 	debug = false,
 	sources = {
-		formatting.prettier.with({ extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } }),
+		formatting.prettier.with({extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } }),
+-- Python 
 		formatting.black.with({ extra_args = { "--fast" } }),
+     diagnostics.flake8, -- python linter
+
 		formatting.stylua, -- add formatters and diagnositcs here
-    -- diagnostics.flake8
+
+    actions.shellcheck, -- Linter aka check for errors/warnings 
+    diagnostics.shellcheck,
+    formatting.shfmt, -- shell formatter, parser, and interpreter
 	},
 })

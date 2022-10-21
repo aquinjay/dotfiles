@@ -3,6 +3,6 @@ if not status_ok then
   return
 end
 
-require "lsp.mason"
+require "lsp.mason" -- lsp is at the same level as core
 require("lsp.handlers").setup() -- 
 require "lsp.null-ls"

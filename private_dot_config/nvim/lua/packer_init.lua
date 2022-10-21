@@ -74,12 +74,11 @@ return packer.startup(function(use)
   --use { "lunarvim/darkplus.nvim"}
 
 	-- Cmp 
-  use { "hrsh7th/nvim-cmp"} -- The completion plugin
-  use { "hrsh7th/cmp-buffer"} -- buffer completions. Buffer is the message definition window that appears when you type
-  use { "hrsh7th/cmp-path"} -- path completions
-	use { "saadparwaiz1/cmp_luasnip"} -- snippet completions. Snippets are the word completion windows that appear
-	use { "hrsh7th/cmp-nvim-lsp"} -- LSP completions
-	use { "hrsh7th/cmp-nvim-lua"} -- Lua completions
+ use { "hrsh7th/nvim-cmp"} -- The completion plugin
+ use { "hrsh7th/cmp-buffer"} -- buffer completions. Buffer is the message definition window that appears when you type
+ use { "hrsh7th/cmp-path"} -- path completions
+ use { "saadparwaiz1/cmp_luasnip"} -- snippet completions. Snippets are the word completion windows that appear 
+ use { "hrsh7th/cmp-nvim-lsp"} -- LSP completions
 
 	-- Snippets
   use { "L3MON4D3/LuaSnip"} --snippet engine. For snip window above.
