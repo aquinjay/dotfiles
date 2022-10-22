@@ -47,10 +47,10 @@ signcolumn = "yes", -- always show the sign column, otherwise it would shift the
 
 expandtab = true, 	                        -- Use spaces instead of tab
 tabstop = 2,		                            -- Insert 2 spaces for a tab
-breakindent = true,                         -- Preserve indentation of virtual lines (connected to wrap)
+shiftwidth = 2, -- Length of shift, I think
+--breakindent = true,                         -- Preserve indentation of virtual lines (connected to wrap)
 smartindent = true,                         -- Autoindent new lines
-
-
+autoindent = true,
 
 -----------------
 -- Memory, CPU --

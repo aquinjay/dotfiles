@@ -112,9 +112,10 @@ cmp.setup {
       vim_item.kind = string.format("%s", kind_icons[vim_item.kind]) -- one of two mutually exclusive kind
       -- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
       vim_item.menu = ({ 
-        nvim_lsp = "[LSP]",
-        nvim_lua = "[LUA]",
         luasnip = "[Luasnip]",
+        cmp_tabnine = "[TN]",
+        --nvim_lsp = "[LSP]",
+        nvim_lua = "[LUA]",
         buffer = "[File]",
         path = "[Path]",
       })[entry.source.name]
@@ -122,9 +123,10 @@ cmp.setup {
     end,
   },
   sources = { -- order of suggestions. Above those is the lsp completion stuff that will be in next video. Delete this comment later.
-    { name = "nvim_lsp" }, -- fed from cmp-nvim-lsp package.
-    { name = "nvim_lua" }, -- fed from cmp-nvim-lua package.
     { name = "luasnip" },
+    { name = "cmp_tabnine" },
+    --{ name = "nvim_lsp" }, -- fed from cmp-nvim-lsp package.
+    { name = "nvim_lua" }, -- fed from cmp-nvim-lua package.
     { name = "buffer" },
     { name = "path" },
   },

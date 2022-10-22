@@ -83,6 +83,7 @@ return packer.startup(function(use)
 	-- Snippets
   use { "L3MON4D3/LuaSnip"} --snippet engine. For snip window above.
   use { "rafamadriz/friendly-snippets"} -- a bunch of snippets to use for many languages.
+  use {"tzachar/cmp-tabnine", run = "./install.sh"}
 
 	-- LSP
 	use { "neovim/nvim-lspconfig"} -- enable LSP. Core Neovim
