@@ -20,7 +20,7 @@ local diagnostics = {
 local diff = {
 	"diff",
 	colored = false,
-	symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
+	symbols = { added = " ", modified = " ", removed = " " }, -- changes diff symbols
   cond = hide_in_width
 }
 
@@ -40,7 +40,7 @@ local filetype = {
 local branch = {
 	"branch",
 	icons_enabled = true,
-	icon = "",
+	icon = "שׂ",
 }
 
 local location = {
@@ -65,7 +65,7 @@ end
 lualine.setup({
 	options = {
 		icons_enabled = true,
-		theme = "auto",
+		theme = "auto", -- Not working
 		component_separators = { left = "", right = "" },
 		section_separators = { left = "", right = "" },
 		disabled_filetypes = { "alpha", "dashboard", "NvimTree", "Outline" },

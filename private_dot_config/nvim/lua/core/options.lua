@@ -5,13 +5,13 @@ local options = {
 ---- General ----
 -----------------
 
- fileencoding = "utf-8",                    -- Default encoding written to a file
- clipboard = "unnamedplus",                 -- Allows Neovim to access the system clipboard by default
- mouse = 'a', 		                          -- Enable mouse support
- completeopt = "menuone,noinsert,noselect", -- autocomplete options for easier navigation
- conceallevel = 0,                          -- so that `` is visible in markdown files
- swapfile = false, -- creates a swapfile
- undodir = undodir, -- Set an undo directory
+  fileencoding = "utf-8",                    -- Default encoding written to a file
+  clipboard = "unnamedplus",                 -- Allows Neovim to access the system clipboard by default
+  mouse = 'a',                               -- Enable mouse support
+  completeopt = "menuone,noinsert,noselect", -- autocomplete options for easier navigation
+  conceallevel = 0,                          -- so that `` is visible in markdown files
+  swapfile = false,                          -- creates a swapfile
+-- undodir = undodir, -- Set an undo directory
 undofile = true, -- enable persistent undo
 writebackup = false, -- if a file is being edited by another program (or was written to file while editing with another program), it is not allowed to be edited
 

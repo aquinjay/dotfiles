@@ -56,50 +56,67 @@ return packer.startup(function(use)
   use { "windwp/nvim-autopairs"} -- Autopairs, integrates with both cmp and treesitter
   use { "numToStr/Comment.nvim"} --Easily input regular comment. 
   use { "JoosepAlviste/nvim-ts-context-commentstring"} -- Know which kind of comment string to use based on context of file
-  use {"ms-jpq/chadtree", branch = 'chad', run = 'python3 -m chadtree deps'}
-  use { "kyazdani42/nvim-web-devicons"}
-  --use { "kyazdani42/nvim-tree.lua", commit = "7282f7de8aedf861fe0162a559fc2b214383c51c" } -- repalced by chadtree
+  --use {"ms-jpq/chadtree", branch = 'chad', run = 'python3 -m chadtree deps'}
+  use { "nvim-tree/nvim-web-devicons"} -- formerly kyazdani42. Colors and Icons
+  use { "nvim-tree/nvim-tree.lua",
+    requires = {'nvim-tree/nvim-web-devicons'},
+    tag = 'nightly'}
   use { "akinsho/bufferline.nvim"}
-	use { "moll/vim-bbye"}
-  use { "nvim-lualine/lualine.nvim"}
-  use { "akinsho/toggleterm.nvim"}
-  --use { "ahmedkhalf/project.nvim", commit = "628de7e433dd503e782831fe150bb750e56e55d6" }
+	use { "moll/vim-bbye"} -- delete buffers without issues
+  use { "nvim-lualine/lualine.nvim", -- Info line at bottom of nvim
+    requires = { 'nvim-tree/nvim-web-devicons', opt = true }}
+  use { "akinsho/toggleterm.nvim"} -- can make multiple terminals 
+  use { "ahmedkhalf/project.nvim"} -- nvim project directory creator
   use { "lewis6991/impatient.nvim"}
-  --use { "lukas-reineke/indent-blankline.nvim", commit = "db7cbcb40cc00fc5d6074d7569fb37197705e7f6" }
+  use { "lukas-reineke/indent-blankline.nvim"} -- Adds indentation guide to blank lines. may have to change config file.
   --use { "goolord/alpha-nvim", commit = "0bb6fc0646bcd1cdb4639737a1cee8d6e08bcc31" }
-	use {"folke/which-key.nvim"}
-
+	use {"folke/which-key.nvim"} -- Just press leader key
+  use {"simnalamburt/vim-mundo"} -- Creates an undo window. No initialization required
+  use {"folke/todo-comments.nvim",
+    requires = "nvim-lua/plenary.nvim"}
+  use {
+  "folke/trouble.nvim",
+  requires = "kyazdani42/nvim-web-devicons",
+  config = function()
+    require("trouble").setup {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    }
+  end
+}
 	-- Colorschemes
   use { "folke/tokyonight.nvim"}
   --use { "lunarvim/darkplus.nvim"}
 
 	-- Cmp 
- use { "hrsh7th/nvim-cmp"} -- The completion plugin
+ use { "hrsh7th/nvim-cmp"} -- The completion plugin for neovim
  use { "hrsh7th/cmp-buffer"} -- buffer completions. Buffer is the message definition window that appears when you type
- use { "hrsh7th/cmp-path"} -- path completions
+ use { "hrsh7th/cmp-path"} -- file system path completions
  use { "saadparwaiz1/cmp_luasnip"} -- snippet completions. Snippets are the word completion windows that appear 
  use { "hrsh7th/cmp-nvim-lsp"} -- LSP completions
 
 	-- Snippets
   use { "L3MON4D3/LuaSnip"} --snippet engine. For snip window above.
   use { "rafamadriz/friendly-snippets"} -- a bunch of snippets to use for many languages.
-  use {"tzachar/cmp-tabnine", run = "./install.sh"}
+  use {"tzachar/cmp-tabnine",
+      run = "./install.sh"}
 
 	-- LSP
 	use { "neovim/nvim-lspconfig"} -- enable LSP. Core Neovim
   use { "williamboman/mason.nvim"} -- simple to use language server installer, Next gen nvim-lsp-installer
-  use { "williamboman/mason-lspconfig.nvim"}
+  use { "williamboman/mason-lspconfig.nvim"} -- needed connections between mason and nvim-lspconfig
 	use { "jose-elias-alvarez/null-ls.nvim"} -- for formatters and linters. Need to install binaries to get this to work. Linter = Fixer. 
-  --use { "RRethy/vim-illuminate", commit = "a2e8476af3f3e993bb0d6477438aad3096512e42" }
+  use { "RRethy/vim-illuminate"} -- highlight repear words
 
 	-- Telescope
-	use { "nvim-telescope/telescope.nvim", requires = { {'nvim-lua/plenary.nvim'} }
+	use { "nvim-telescope/telescope.nvim",
+      requires = { {'nvim-lua/plenary.nvim'} }
   } -- Super powerfuls fuzzy finder
 
 	-- Treesitter
-  use {'nvim-treesitter/nvim-treesitter', -- Syntax highlighting
-        }
-  use {'p00f/nvim-ts-rainbow'} -- Can see where parenthasis start and end
+  use {'nvim-treesitter/nvim-treesitter'} -- Syntax highlighting
+  use {'p00f/nvim-ts-rainbow'} -- Can see where parenthasis start and end. Configured in treesitter.
 
 	-- Git
 	use { "lewis6991/gitsigns.nvim"} -- create git indicators in code and provide commands to navigate git 
