@@ -13,8 +13,8 @@ end
 
 -- See: https://github.com/nvim-treesitter/nvim-treesitter#quickstart
 configs.setup({
-	ensure_installed = {"c", "cpp", "bash", "fish", "css", "cuda", "dockerfile", "graphql",
-        "html", "json", "latex", "llvm", "lua", "markdown", "python", "r", "regex", "sql", 
+	ensure_installed = {"cmake" ,"c", "cpp", "bash", "fish", "css", "cuda", "dockerfile", "graphql",
+        "html", "json", "latex", "llvm", "lua", "markdown", "python", "r", "regex", "sql",
         "typescript", "vim", "vue", "yaml"}, -- one of "all" or a list of languages
 	ignore_install = { "" }, -- List of parsers to ignore installing
 	highlight = {

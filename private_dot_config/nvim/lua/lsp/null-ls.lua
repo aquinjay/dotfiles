@@ -14,13 +14,16 @@ local actions = null_ls.builtins.code_actions
 null_ls.setup({
 	debug = false,
 	sources = {
+
+-- JavaScript
 		formatting.prettier.with({extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } }),
 -- Python 
 		formatting.black.with({ extra_args = { "--fast" } }),
      diagnostics.flake8, -- python linter
-
+-- Lua
 		formatting.stylua, -- add formatters and diagnositcs here
 
+-- Shell 
     actions.shellcheck, -- Linter aka check for errors/warnings 
     diagnostics.shellcheck,
     formatting.shfmt, -- shell formatter, parser, and interpreter
