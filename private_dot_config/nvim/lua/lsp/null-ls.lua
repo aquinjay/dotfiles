@@ -15,8 +15,12 @@ null_ls.setup({
 	debug = false,
 	sources = {
 
--- JavaScript
-		formatting.prettier.with({extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } }),
+-- JavaScript and Vue
+    actions.eslint_d,
+    diagnostics.eslint_d,
+    formatting.eslint_d.with({filetypes = {"vue"} }), -- Vue only
+		formatting.deno_fmt, -- No Vue
+		--formatting.prettier.with({extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } }),
 -- Python 
 		formatting.black.with({ extra_args = { "--fast" } }),
      diagnostics.flake8, -- python linter
@@ -27,5 +31,7 @@ null_ls.setup({
     actions.shellcheck, -- Linter aka check for errors/warnings 
     diagnostics.shellcheck,
     formatting.shfmt, -- shell formatter, parser, and interpreter
+
+-- C++
 	},
 })
