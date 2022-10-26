@@ -59,7 +59,7 @@ autoindent = true,
 hidden = true, -- Enable background buffers
 lazyredraw = true, -- Faster scrolling
 ruler = false, -- Remove line and column number calcs to display
-timeoutlen = 1000, -- time to wait for a mapped sequence to complete (in milliseconds)
+timeoutlen = 300, -- time to wait for a mapped sequence to complete (in milliseconds)
 updatetime = 100, -- faster completion
 
 

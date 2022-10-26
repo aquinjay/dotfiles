@@ -3,7 +3,7 @@ if not status_ok then
   return
 end
 
-local actions = require "telescope.actions"
+local actions = require "telescope.actions" --Actions are for creating personal bindings,
 
 telescope.setup {
   defaults = {
@@ -13,7 +13,7 @@ telescope.setup {
     path_display = { "smart" },
 
     mappings = { -- default keybindings
-      i = {
+      i = { -- Insert mode
         ["<C-n>"] = actions.cycle_history_next,
         ["<C-p>"] = actions.cycle_history_prev,
 
@@ -44,7 +44,7 @@ telescope.setup {
         ["<C-_>"] = actions.which_key, -- keys from pressing <C-/>
       },
 
-      n = {
+      n = { -- Normal mode
         ["<esc>"] = actions.close,
         ["<CR>"] = actions.select_default,
         ["<C-x>"] = actions.select_horizontal,
