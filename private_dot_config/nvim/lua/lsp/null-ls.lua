@@ -12,18 +12,20 @@ local diagnostics = null_ls.builtins.diagnostics
 local actions = null_ls.builtins.code_actions
 
 null_ls.setup({
-	debug = false,
+	debug = true,
 	sources = {
 
 -- JavaScript and Vue
-    actions.eslint_d,
-    diagnostics.eslint_d,
-    formatting.eslint_d.with({filetypes = {"vue"} }), -- Vue only
+    actions.refactoring.with({filetypes = {"javascript", "python"}}),
+    --diagnostics.jsonlint.with({filetypes = {"javascript"}}),
+    diagnostics.jshint,
+    --formatting.eslint_d.with({filetypes = {"vue"} }), -- Vue only
 		formatting.deno_fmt, -- No Vue
-		--formatting.prettier.with({extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" } }),
+		--formatting.prettierd.with({extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" }
+      --filetypes = {"vue", "css"}}),
 -- Python 
 		formatting.black.with({ extra_args = { "--fast" } }),
-     diagnostics.flake8, -- python linter
+    diagnostics.flake8, -- python linter
 -- Lua
 		formatting.stylua, -- add formatters and diagnositcs here
 

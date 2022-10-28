@@ -90,11 +90,12 @@ return packer.startup(function(use)
   --use { "lunarvim/darkplus.nvim"}
 
 	-- Cmp 
- use { "hrsh7th/nvim-cmp"} -- The completion plugin for neovim
- use { "hrsh7th/cmp-buffer"} -- buffer completions. Buffer is the message definition window that appears when you type
+ use { "hrsh7th/nvim-cmp"} -- The core completion plugin for neovim
+ use { "hrsh7th/cmp-buffer"} -- buffer completions. Buffer is the message definition window that appears when you type. Completes words.
  use { "hrsh7th/cmp-path"} -- file system path completions
- use { "saadparwaiz1/cmp_luasnip"} -- snippet completions. Snippets are the word completion windows that appear 
- use { "hrsh7th/cmp-nvim-lsp"} -- LSP completions
+ use { "hrsh7th/cmp-nvim-lua"} -- Has special neovim knowledge for Lua
+ use { "saadparwaiz1/cmp_luasnip"} -- snippet completions. Snippets are the word completion windows that appear.
+ use { "hrsh7th/cmp-nvim-lsp"} -- LSP completions. Auto import on complete and can move between snippets, expanding snippets etc
 
 	-- Snippets
   use { "L3MON4D3/LuaSnip"} --snippet engine. For snip window above.
@@ -107,7 +108,7 @@ return packer.startup(function(use)
   use { "williamboman/mason.nvim"} -- simple to use language server installer, Next gen nvim-lsp-installer
   use { "williamboman/mason-lspconfig.nvim"} -- needed connections between mason and nvim-lspconfig
 	use { "jose-elias-alvarez/null-ls.nvim"} -- for formatters and linters. Need to install binaries to get this to work. Linter = Fixer. 
-  use { "RRethy/vim-illuminate"} -- highlight repear words
+  use { "RRethy/vim-illuminate"} -- highlight repeat words
 
 	-- Telescope
 	use { "nvim-telescope/telescope.nvim",

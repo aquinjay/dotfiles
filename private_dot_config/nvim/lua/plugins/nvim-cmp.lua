@@ -56,6 +56,7 @@ local kind_icons = {
 -- find more here: https://www.nerdfonts.com/cheat-sheet
 
 -- Below comes from nvim-cmp configuration recomendation
+-- Check out :help ins-completeion for more information
 cmp.setup {
   snippet = {
     expand = function(args)
@@ -109,12 +110,12 @@ cmp.setup {
     fields = { "kind", "abbr", "menu" },
     format = function(entry, vim_item)
       -- Kind icons
-      vim_item.kind = string.format("%s", kind_icons[vim_item.kind]) -- one of two mutually exclusive kind
-      -- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
-      vim_item.menu = ({ 
+      --vim_item.kind = string.format("%s", kind_icons[vim_item.kind]) -- one of two mutually exclusive kind
+      vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
+      vim_item.menu = ({
         luasnip = "[Luasnip]",
         cmp_tabnine = "[TN]",
-        --nvim_lsp = "[LSP]",
+        nvim_lsp = "[LSP]",
         nvim_lua = "[LUA]",
         buffer = "[File]",
         path = "[Path]",
@@ -124,8 +125,8 @@ cmp.setup {
   },
   sources = { -- order of suggestions. Above those is the lsp completion stuff that will be in next video. Delete this comment later.
     { name = "luasnip" },
-    { name = "cmp_tabnine" },
-    --{ name = "nvim_lsp" }, -- fed from cmp-nvim-lsp package.
+    { name = "cmp_tabnine", keyword_length = 5, max_item_count = 3},-- works after 5 keys and will only provide 3 possibilities.
+    { name = "nvim_lsp" }, -- fed from cmp-nvim-lsp package.
     { name = "nvim_lua" }, -- fed from cmp-nvim-lua package.
     { name = "buffer" },
     { name = "path" },

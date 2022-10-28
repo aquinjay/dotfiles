@@ -3,15 +3,15 @@ local servers = {
 	"sumneko_lua",
 	"cssls",
 	"html",
-	"tsserver",
+	--"tsserver",  --NOTE: replaced by denols
 	"pyright",
 	"bashls",
 	"jsonls",
 	"yamlls",
-  "clangd",
-  "cmake",
+  --"clangd",
+  --"cmake",
   "denols",
-  "r_language_server",
+  --"r_language_server",
   "volar", -- Better than vuels
   "dockerls",
 }

@@ -61,9 +61,9 @@ local function lsp_keymaps(bufnr)
 	keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts) --NOTE: Display information about symbol.
 	keymap(bufnr, "n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts) -- NOTE: Find where symbol is declared. Seems to not be supported so far.
 	keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts) --NOTE: Find symbol of the same class across many files.
-	keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts) --NOTE: Show diagnostics
-	keymap(bufnr, "n", "gn", "<cmd>lua vim.diagnostic.goto_next({buffer=0)<CR>", opts) --NOTE: Show next diagnostic
-	keymap(bufnr, "n", "gb", "<cmd>lua vim.diagnostic.goto_prev({buffer=0)<CR>", opts) --NOTE: Show previous diagnostic
+	keymap(bufnr, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<cr>", opts) --NOTE: Show diagnostics
+	keymap(bufnr, "n", "gn", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<CR>", opts) --NOTE: Show next diagnostic
+	keymap(bufnr, "n", "gb", "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<CR>", opts) --NOTE: Show previous diagnostic
 	keymap(bufnr, "n", "<leader>lf", "<cmd>lua vim.lsp.buf.format()<cr>", opts) --NOTE: Format code.
 	keymap(bufnr, "n", "<leader>lr", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", opts) --NOTE: List all symbols
 	--keymap(bufnr, "n", "<leader>li", "<cmd>LspInfo<cr>", opts)
@@ -77,8 +77,8 @@ local function lsp_keymaps(bufnr)
 end
 
 M.on_attach = function(client, bufnr)
-	if client.name == "tsserver" then
-		client.server_capabilities.documentFormattingProvider = false
+	if client.name == "denols" then
+		client.server_capabilities.documentFormattingProvider = true
 	end
 
 	if client.name == "sumneko_lua" then
@@ -94,3 +94,7 @@ M.on_attach = function(client, bufnr)
 end
 
 return M
+
+
+ -- add to list M and will export at the end of the file so we can access all the non-local functions
+
