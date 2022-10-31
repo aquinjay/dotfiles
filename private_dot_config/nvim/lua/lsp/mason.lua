@@ -8,8 +8,8 @@ local servers = {
 	"bashls",
 	"jsonls",
 	"yamlls",
-  --"clangd",
-  --"cmake",
+  "clangd",
+  "cmake",
   "denols",
   --"r_language_server",
   "volar", -- Better than vuels

@@ -11,9 +11,13 @@ local diagnostics = null_ls.builtins.diagnostics
 
 local actions = null_ls.builtins.code_actions
 
+local completion = null_ls.builtins.completion
+
 null_ls.setup({
 	debug = true,
 	sources = {
+    -- All filetypes 
+    completion.luasnip,
 
 -- JavaScript and Vue
     actions.refactoring.with({filetypes = {"javascript", "python"}}),
@@ -21,8 +25,7 @@ null_ls.setup({
     diagnostics.jshint,
     --formatting.eslint_d.with({filetypes = {"vue"} }), -- Vue only
 		formatting.deno_fmt, -- No Vue
-		--formatting.prettierd.with({extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" }
-      --filetypes = {"vue", "css"}}),
+		formatting.prettierd.with({extra_args = { "--no-semi", "--single-quote", "--jsx-single-quote" }, filetypes = {"vue", "css"}}),
 -- Python 
 		formatting.black.with({ extra_args = { "--fast" } }),
     diagnostics.flake8, -- python linter
@@ -35,5 +38,8 @@ null_ls.setup({
     formatting.shfmt, -- shell formatter, parser, and interpreter
 
 -- C++
+    diagnostics.cppcheck, -- Can make really cool setups with this
+    diagnostics.cpplint, -- Google style guide
+    --formatting.clang_format, -- Tool to format C/C++. Comes automatically with clangd from what I understand.
 	},
 })

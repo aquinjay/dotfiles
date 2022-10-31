@@ -33,3 +33,10 @@ See handlers file to get a good understanding of Lua.
 ## Treesitter
 
 Does dyntax highlighting.
+
+## LSP 
+
+Bash: Just works
+Python: Just works. 
+JavaScript: For current setup add an empty .git file in root directory. Otherwise you will need a specific configuration file in every project. 
+C++: Install cppcheck (its pretty cool) using your system package manager. Need a file at least in root directory called compile_commands.json to generically run code.

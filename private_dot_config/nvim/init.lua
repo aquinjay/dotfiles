@@ -19,6 +19,7 @@ require "plugins.whichkey"
 require "plugins.project"
 require "plugins.indentline"
 require "plugins.todo-comments"
+require "plugins.null-ls"
 --require "personal.alpha"
 require "lsp" -- Can require directories without the specific name of file. Just include an init.lua file within the directory
 --require "personal.dap"

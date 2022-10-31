@@ -110,6 +110,9 @@ return packer.startup(function(use)
 	use { "jose-elias-alvarez/null-ls.nvim"} -- for formatters and linters. Need to install binaries to get this to work. Linter = Fixer. 
   use { "RRethy/vim-illuminate"} -- highlight repeat words
 
+  -- DAP Debug Adapter Protocl 
+  use {"mfussenegger/nvim-dap"}
+
 	-- Telescope
 	use { "nvim-telescope/telescope.nvim",
       requires = { {'nvim-lua/plenary.nvim'} }
