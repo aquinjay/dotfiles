@@ -13,6 +13,7 @@ local servers = {
   "denols",
   --"r_language_server",
   "volar", -- Better than vuels
+  --"vuels",
   "dockerls",
 }
 

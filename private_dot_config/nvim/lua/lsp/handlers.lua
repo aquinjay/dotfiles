@@ -74,10 +74,16 @@ local function lsp_keymaps(bufnr)
 	keymap(bufnr, "n", "<leader>lr", "<cmd>lua vim.lsp.buf.rename()<cr>", opts)-- NOTE: Rename all references to the symbol
 	keymap(bufnr, "n", "<leader>ls", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts) --WARN: Does not seem to work
 	keymap(bufnr, "n", "<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts) --NOTE: Show all diagnostics on a list.
+  -- DAP 
+  keymap(bufnr, "n", "<leader>db", "<cmd> lua require'dap'.toggle_breakpoint() <cr>", opts)
+  keymap(bufnr, "n", "<leader>dc", "<cmd> lua require'dap'.continue() <cr>", opts)
+  keymap(bufnr, "n", "<leader>do", "<cmd> lua require'dap'.step_over() <cr>", opts)
+  keymap(bufnr, "n", "<leader>di", "<cmd> lua require'dap'.step_into() <cr>", opts)
+  keymap(bufnr, "n", "<leader>di", "<cmd> lua require'dap'.repl.open() <cr>", opts)
 end
 
 M.on_attach = function(client, bufnr)
-	if client.name == "denols" then
+	if client.name == "tsserver" then
 		client.server_capabilities.documentFormattingProvider = false
 	end
 

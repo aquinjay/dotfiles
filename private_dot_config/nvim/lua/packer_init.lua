@@ -50,7 +50,7 @@ packer.init({
 -- Below is just cloning github repos 
 return packer.startup(function(use)
   -- :Packer then tab to see all commands
-  use { "wbthomason/packer.nvim",  -- Your package manager
+  use { "wbthomason/packer.nvim"  -- Your package manager
         } -- Have packer manage itself
   use "nvim-lua/plenary.nvim" -- Useful lua helper functions used by lots of plugins.
   use { "windwp/nvim-autopairs"} -- Autopairs, integrates with both cmp and treesitter
@@ -107,11 +107,14 @@ return packer.startup(function(use)
 	use { "neovim/nvim-lspconfig"} -- enable LSP. Core Neovim
   use { "williamboman/mason.nvim"} -- simple to use language server installer, Next gen nvim-lsp-installer
   use { "williamboman/mason-lspconfig.nvim"} -- needed connections between mason and nvim-lspconfig
-	use { "jose-elias-alvarez/null-ls.nvim"} -- for formatters and linters. Need to install binaries to get this to work. Linter = Fixer. 
+	use { "jose-elias-alvarez/null-ls.nvim",
+    requires = { "nvim-lua/plenary.nvim" }} -- for formatters and linters. Need to install binaries to get this to work. Linter = Fixer. 
   use { "RRethy/vim-illuminate"} -- highlight repeat words
 
   -- DAP Debug Adapter Protocl 
   use {"mfussenegger/nvim-dap"}
+  use { "rcarriga/nvim-dap-ui",
+    requires = {"mfussenegger/nvim-dap"} }
 
 	-- Telescope
 	use { "nvim-telescope/telescope.nvim",
