@@ -83,8 +83,10 @@ return packer.startup(function(use)
       -- or leave it empty to use the default settings
       -- refer to the configuration section below
     }
-  end
-}
+  end}
+  use {"shatur/neovim-session-manager",
+    requires = "nvim-lua/plenary.nvim"}
+
 	-- Colorschemes
   use { "folke/tokyonight.nvim"}
   --use { "lunarvim/darkplus.nvim"}

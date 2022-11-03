@@ -79,5 +79,8 @@ null_ls.setup({
      diagnostics.cppcheck, -- Can make really cool setups with this
      diagnostics.cpplint, -- Google style guide
     --formatting.clang_format, -- Tool to format C/C++. Comes automatically with clangd from what I understand.
+-- CMake 
+     diagnostics.cmake_lint,
+    formatting.cmake_format,
 	},
    })
