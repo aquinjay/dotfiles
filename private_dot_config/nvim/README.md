@@ -21,15 +21,11 @@ Options is used to configre simple options for NVIM. Run the command: "help opti
 Keymaps are used to remap defaults keybindings in neovim. Note this specific file is idiosyncratic compared to how remaps are typically done. 
 Review contents in the file iteself before consulting external guides.
 
-Colorshceme is the key
+Colorshceme is the settings scritp to apply color designs to the neovim configuration.
 
-## Plugins
-Managed by packer. Plugins stored in .local/share/nvim/site. Where all plugins save their data. There are optional and start. Start just run on startup. 
-Optional is where lazy loaded plugins live. Note more lazy loading will not necessarily speed things up.
+### packer_init
 
-Can view messages using the message command.
-
-Snippets and completions require extra configuration in cmp file.
+This is the lua script utilizing packer to manage plugins. Plugins are stored in .local/share/nvim/site. Where all plugins save their data. These are optional and start. Start just run on startup. 
 
 ##LSP 
 
