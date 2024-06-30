@@ -1,12 +1,12 @@
 # Explanation of NVIM File Structure
 
-**Init.lua** is the entry point for NVIM and runs everything specified on startup. Will only ever run "require" commands.
+**Init.lua** is the entry point for NVIM and runs everything specified on startup. Will only ever run "require" and "spec" commands. I defined "spec" as a function that installs
 
 **Lua** directory is where all referenced lua files are stored to create better seperation and organization. There is a nested directory for additional specification 
 of type of configuration file. This seperation is mainly to prevent collisions between some of the further nested lua files but can also be a way to let the user 
 know what this configuration is for.
 
-**Plugin** is where the package manager 'packer' stores plugin data to manage and compile the plugins. This file can be deleted but will respawn when neovim is ran again.
+**Plugin** is where the package manager 'lazy' stores plugin data to manage and compile the plugins. This file can be deleted but will respawn when neovim is ran again.
 
 **README.md** is this file.
 
