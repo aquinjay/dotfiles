@@ -83,7 +83,8 @@ function M.config()
     "bashls",
     "jsonls",
     "yamlls",
-    "clangd"
+    "clangd",
+    "tsserver"
   }
 
   local default_diagnostic_config = {

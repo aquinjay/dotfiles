@@ -2,6 +2,8 @@
 local keymap = vim.keymap.set
 local opts = { noremap = true, silent = true } -- triggers map directly without being intercepted by other maps that share the same key
 
+local term_opts = {silent = true}
+
 -- Leader key re-maps need to happen before plugins are installed.
 keymap("n", "<Space>", "", opts)
 vim.g.mapleader = " "

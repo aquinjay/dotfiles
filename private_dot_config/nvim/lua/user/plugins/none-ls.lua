@@ -9,16 +9,16 @@ local M = {
 function M.config()
   local null_ls = require "null-ls"
 
-  local formatting = null_ls.builtins.formatting
+  -- local formatting = null_ls.builtins.formatting
   -- local diagnostics = null_ls.builtins.diagnostics
-  local diagnostics = null_ls.methods.DIAGNOSTICS
-  local actions = null_ls.builtins.code_actions
+  -- local diagnostics = null_ls.methods.DIAGNOSTICS
+  -- local actions = null_ls.builtins.code_actions
 
   null_ls.setup {
-    debug = false,
+    debug = true,
     sources = {
       -- Lua
-      formatting.stylua, -- Add formatters and linters
+      null_ls.builtins.formatting.stylua, -- Add formatters and linters
       --formatting.prettier,
       -- formatting.prettier.with {
       --   extra_filetypes = { "toml" },
@@ -27,10 +27,10 @@ function M.config()
       -- formatting.eslint,
       -- null_ls.builtins.diagnostics.flake8,
       -- Python 
-      formatting.black.with({
-        extra_args = {"--fast"},
-        filetypes = {"python"}
-      }),
+      -- null_ls.builtins.formatting.black.with({
+      --   extra_args = {"--fast"},
+      --   filetypes = {"python"}
+      -- }),
       -- diagnostics.flake8, -- python linter
       -- null_ls.builtins.completion.spell,
 
@@ -40,12 +40,12 @@ function M.config()
       --formatting.shfmt, -- shell formatter, parser, and interpreter
 
       -- C++
-      diagnostics.cppcheck, -- Can make really cool setups with this
+      -- diagnostics.cppcheck, -- Can make really cool setups with this
 -- C++ Formatting
-      formatting.clang_format.with({
-          filetypes = { "cpp" },  -- Ensure it's applied to these languages
-          extra_args = { "--style=Google" },  -- Customize your format style (Google, LLVM, Mozilla, etc.)
-      }),
+      --formatting.clang_format.with({
+      --    filetypes = { "cpp" },  -- Ensure it's applied to these languages
+      --    extra_args = { "--style=Google" },  -- Customize your format style (Google, LLVM, Mozilla, etc.)
+      --}),
 
       ----formatting.clang_format, -- Tool to format C/C++. Comes automatically with clangd from what I understand.
       ---- CMake 

@@ -5,7 +5,7 @@ local options = {
 	---- General ----
 	-----------------
 
-	fileencoding = "utf-8", -- Default encoding written to a file
+	fileencoding = "utf-16", -- Default encoding written to a file
 	clipboard = "unnamedplus", -- Allows Neovim to access the system clipboard by default
 	mouse = "a", -- Enable mouse support
 	completeopt = "menuone,noinsert,noselect", -- autocomplete options for easier navigation
