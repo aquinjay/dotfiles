@@ -11,7 +11,7 @@ function M.config()
 
   -- local formatting = null_ls.builtins.formatting
   -- local diagnostics = null_ls.builtins.diagnostics
-  -- local diagnostics = null_ls.methods.DIAGNOSTICS
+  local diagnostics = null_ls.builtins.diagnostics
   -- local actions = null_ls.builtins.code_actions
 
   null_ls.setup {
