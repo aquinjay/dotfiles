@@ -5,7 +5,7 @@ local options = {
 	---- General ----
 	-----------------
 
-	fileencoding = "utf-16", -- Default encoding written to a file
+	fileencoding = "utf-8", -- Default encoding written to a file
 	clipboard = "unnamedplus", -- Allows Neovim to access the system clipboard by default
 	mouse = "a", -- Enable mouse support
 	completeopt = "menuone,noinsert,noselect", -- autocomplete options for easier navigation
@@ -41,7 +41,6 @@ local options = {
 	signcolumn = "yes", -- always show the sign column, otherwise it would shift the text each time
 	--showcmd = false, -- Hide last command
   relativenumber = true,
-  cursorline = true, -- show which line the cursor is one
   list = true, -- display certain white space characters in the editor
   listchars = { tab = '» ', trail = '·', nbsp = '␣' },
 
