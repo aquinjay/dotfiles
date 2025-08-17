@@ -39,6 +39,15 @@ local M = {
       "hrsh7th/cmp-nvim-lua", -- Provides Neovim Lua API completions.
       -- This plugin is always loaded, no specific event required.
     },
+    {
+      "tzachar/cmp-tabnine", -- Tabnine completion source for nvim-cmp.
+      build = "./install.sh",
+      event = "InsertEnter",
+    },
+    {
+      "hrsh7th/cmp-calc", -- Calculator completion source for nvim-cmp.
+      event = "InsertEnter",
+    },
   },
 }
 
@@ -120,7 +129,7 @@ function M.config()
         vim_item.kind = icons.kind[vim_item.kind]
         vim_item.menu = ({
           nvim_lsp = "[LSP]",
-          nvim_lua = "LUA]",
+          nvim_lua = "[Lua]",
           luasnip = "[LuaSnip",
           buffer = "[File]",
           path = "[Path]",
