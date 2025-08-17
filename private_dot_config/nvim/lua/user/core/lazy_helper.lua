@@ -1,8 +1,11 @@
--- helper table & function to add plugins and their options aka specifications
+-- helper module to add plugins and their options aka specifications
+local M = {}
 
-LAZY_PLUGIN_SPEC = {}
+M.plugin_spec = {}
 
 -- Function to add plugins and specs to the plugin table
-function spec(item)
-  table.insert(LAZY_PLUGIN_SPEC, { import = item })
+function M.spec(item)
+  table.insert(M.plugin_spec, { import = item })
 end
+
+return M

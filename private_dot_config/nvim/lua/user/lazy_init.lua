@@ -12,10 +12,12 @@ if not vim.loop.fs_stat(lazypath) then -- if the above does not exit, then insta
 end
 vim.opt.rtp:prepend(lazypath)
 
+local lazy_helper = require "user.core.lazy_helper"
+
 -- Have lazy find the plugins file and require all the plugins listed
 require("lazy").setup({
   --"folke/tokyonight.nvim",
-  spec = LAZY_PLUGIN_SPEC,
+  spec = lazy_helper.plugin_spec,
   install = {
     colorscheme = {"tokyonight"}
   },
