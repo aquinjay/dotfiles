@@ -1,45 +1,39 @@
-# Explanation of NVIM File Structure
+# Neovim Configuration Overview
 
-**Init.lua** is the entry point for NVIM and runs everything specified on startup. Will only ever run "require" and "spec" commands. I defined "spec" as a function that installs
+This Neovim configuration is organized so that startup is predictable and each feature lives in its own module. The following sections explain how the files fit together and what to expect when using the setup.
 
-**Lua** directory is where all referenced lua files are stored to create better seperation and organization. There is a nested directory for additional specification 
-of type of configuration file. This seperation is mainly to prevent collisions between some of the further nested lua files but can also be a way to let the user 
-know what this configuration is for.
+## Startup Flow
+- **`init.lua`** is the only file Neovim reads directly. It loads core options/keymaps, registers the plugin specs that should be installed, and finally runs the Lazy bootstrapper.
+- **`lua/user/core/lazy_helper.lua`** keeps a list of plugin imports. Each call to `lazy_helper.spec "user.plugins.some_plugin"` in `init.lua` tells Lazy.nvim to import the plugin definition stored in `lua/user/plugins/some_plugin.lua`.
+- **`lua/user/lazy_init.lua`** makes sure [`lazy.nvim`](https://github.com/folke/lazy.nvim) is installed, adds it to Neovim's runtime path, and hands the collected plugin specs to `require("lazy").setup`. The UI is configured to use rounded borders and will automatically install the `tokyonight` colorscheme if it is missing.
 
-**Plugin** is where the package manager 'lazy' stores plugin data to manage and compile the plugins. This file can be deleted but will respawn when neovim is ran again.
+## Core Configuration
+- **`lua/user/core/options.lua`** sets fundamental editor options (indentation, search behavior, UI tweaks, etc.). Adjust this file for editor-wide behavior.
+- **`lua/user/core/keymaps.lua`** defines custom keybindings. Most keymaps are set directly through Lua for clarity and to avoid collision with plugin configs.
+- **`lua/user/core/colorscheme.lua`** applies the default theme. Because Lazy ensures `tokyonight.nvim` is present, this file simply sets the colorscheme after plugins are loaded.
 
-**README.md** is this file.
+## Plugin Specs
+Each file in **`lua/user/plugins/`** returns a Lazy plugin specification table. Important examples include:
+- `colorscheme.lua` – installs and configures `folke/tokyonight.nvim`.
+- `cmp.lua` – configures autocompletion (`nvim-cmp`, `LuaSnip`, and related sources).
+- `lspconfig.lua` & `mason.lua` – integrate the LSP client with Mason for easy language-server installs. Mason handles server downloads, while `lspconfig.lua` wires the servers into Neovim when they are available.
+- `treesitter.lua` – enables syntax-aware highlighting and text objects.
+- `lualine.lua`, `devicons.lua`, `indentline.lua`, `todo_comments.lua`, `hardtime.lua`, etc. – provide UI niceties, productivity helpers, and extra diagnostics.
 
-## Lua Directory
+Some plugin specs (such as `whichkey.lua`, `telescope.lua`, `comment.lua`, and `none-ls.lua`) are present but not currently imported in `init.lua`. To enable them, uncomment the corresponding `lazy_helper.spec` line. The `old_lspconfig.lua` file is kept for reference but is not used.
 
-Contains **core**, **lsp**, **packer_init**, and **plugins**.
+## LSP, Treesitter, and Tooling
+- LSP servers are managed through Mason. Run `:Mason` inside Neovim to install language servers; `lspconfig.lua` automatically registers handlers for installed servers.
+- Treesitter parsers are installed and configured via the `treesitter.lua` spec. Use `:TSInstall` to add additional languages if needed.
+- Completion, snippets, autopairs, and editor hints work together: `nvim-cmp` surfaces results, `LuaSnip` provides snippet expansion, and other helper plugins polish the UX (e.g., `nvim-autopairs` for bracket pairing and `todo-comments.nvim` for TODO highlighting).
 
-### Core
+## Extending the Setup
+1. Create a new file in `lua/user/plugins/` that returns a Lazy spec for the plugin you want to add.
+2. Add `lazy_helper.spec "user.plugins.your_file"` to `init.lua`.
+3. Restart Neovim; Lazy.nvim will install the plugin on the next launch.
 
-**Options** is used to configre simple options for NVIM. Run the command: "help options" to learn more about possible options and details.
+## Repository Notes
+- `lazy-lock.json` records exact plugin commits to keep installations reproducible.
+- The `lua/user/lsp/.keep` placeholder keeps the directory tracked even if no explicit files are present yet.
 
-**Keymaps** are used to remap defaults keybindings in neovim. Note this specific file is idiosyncratic compared to how remaps are typically done. 
-Review contents in the file iteself before consulting external guides.
-
-**Colorshceme** is the settings scritp to apply color designs to the neovim configuration.
-
-### packer_init
-
-This is the lua script utilizing packer to manage plugins. Plugins are stored in .local/share/nvim/site. Where all plugins save their data. These are optional and start. Start just run on startup. 
-
-##LSP 
-
-Language server protocol. Use command LSP.. to manipulate LSP commands. Press i over server name to install the LSP.
-
-See handlers file to get a good understanding of Lua.
-
-## Treesitter
-
-Does dyntax highlighting.
-
-## LSP 
-
-Bash: Just works
-Python: Just works. 
-JavaScript: For current setup add an empty .git file in root directory. Otherwise you will need a specific configuration file in every project. 
-C++: Install cppcheck (its pretty cool) using your system package manager. Need a file at least in root directory called compile_commands.json to generically run code.
+With this structure, most configuration changes can be isolated to a single Lua module, making it easier to maintain and reason about how the Neovim environment behaves.
