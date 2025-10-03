@@ -1,7 +1,7 @@
 ---@type LazyPluginSpec
 local M = {
   "TobinPalmer/Tip.nvim",
-  event = "VimEnter",
+  lazy=false,
   dependencies = {
     "nvim-lua/plenary.nvim",
     "rcarriga/nvim-notify",
