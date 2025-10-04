@@ -22,6 +22,20 @@ Each file in **`lua/user/plugins/`** returns a Lazy plugin specification table. 
 
 Some plugin specs (such as `whichkey.lua`, `telescope.lua`, `comment.lua`, and `none-ls.lua`) are present but not currently imported in `init.lua`. To enable them, uncomment the corresponding `lazy_helper.spec` line. The `old_lspconfig.lua` file is kept for reference but is not used.
 
+### What is still useful on Neovim 0.11?
+
+Neovim 0.11 has gained quality-of-life features (built-in inlay hints, `vim.lsp.enable`, `vim.snippet`, etc.), but the core of this configuration still relies on a few plugins for good reason:
+
+| Plugin | Why it is still relevant |
+| --- | --- |
+| `cmp.lua` | `nvim-cmp` mixes completion from LSP, buffer, snippets, filesystem paths, and even emoji in one menu, while handling custom keymaps and snippet jumps.【F:private_dot_config/nvim/init.lua†L10-L25】【F:private_dot_config/nvim/lua/user/plugins/cmp.lua†L1-L170】|
+| `lspconfig.lua` | `nvim-lspconfig` keeps per-server defaults and lets you expand beyond `lua_ls` when you are ready. The comment in `init.lua` notes it “may not be needed,” but removing it would mean managing every server by hand even with the new `vim.lsp.enable` helper.【F:private_dot_config/nvim/init.lua†L17-L18】【F:private_dot_config/nvim/lua/user/plugins/lspconfig.lua†L1-L22】|
+| `mason.lua` | Mason still saves you from manually downloading language servers; this spec auto-installs Lua, Python, Bash, and JSON servers with a UI that fits the rest of the setup.【F:private_dot_config/nvim/init.lua†L18】【F:private_dot_config/nvim/lua/user/plugins/mason.lua†L1-L34】|
+| `treesitter.lua` | Neovim ships with Tree-sitter runtimes, but the `nvim-treesitter` plugin (configured in `treesitter.lua`) handles parser installation, highlighting, and text objects that the core still lacks.【F:private_dot_config/nvim/init.lua†L21】|
+| Comment toggling | Although the comment spec is disabled, Neovim still does not ship a `gc`/`gb` style toggler. If you want motion-based commenting, re-enabling `comment.lua` (and optionally `whichkey.lua`) remains the easiest route.【F:private_dot_config/nvim/init.lua†L16-L25】【F:private_dot_config/nvim/lua/user/plugins/comment.lua†L1-L31】|
+
+Everything else in `init.lua` is cosmetic or workflow sugar: feel free to disable `lualine`, `devicons`, `todo_comments`, `hardtime`, `nerdy`, `illuminate`, or `indentline` when you do not need them—they are not required for Neovim 0.11 itself.【F:private_dot_config/nvim/init.lua†L12-L24】
+
 ## LSP, Treesitter, and Tooling
 - LSP servers are managed through Mason. Run `:Mason` inside Neovim to install language servers; `lspconfig.lua` automatically registers handlers for installed servers.
 - Treesitter parsers are installed and configured via the `treesitter.lua` spec. Use `:TSInstall` to add additional languages if needed.
