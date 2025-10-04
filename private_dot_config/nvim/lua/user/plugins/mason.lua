@@ -206,42 +206,61 @@ function M.config()
     return -- Nothing more to do if the LSP client isn't present.
   end
 
-  mason_lspconfig.setup_handlers {
-    function(server_name)
-      local opts = {}
+  local function configure_server(server_name)
+    local opts = {}
 
-      local has_custom_opts, custom_opts = pcall(require, "user.lsp.settings." .. server_name)
-      if has_custom_opts then
-        if type(custom_opts) == "function" then
-          custom_opts = custom_opts()
-        end
-
-        if type(custom_opts) == "table" then
-          opts = deep_merge(opts, custom_opts)
-        else
-          notify(
-            string.format(
-              "mason-lspconfig: expected table from user.lsp.settings.%s, got %s",
-              server_name,
-              type(custom_opts)
-            ),
-            vim.log.levels.WARN
-          )
-        end
+    local has_custom_opts, custom_opts = pcall(require, "user.lsp.settings." .. server_name)
+    if has_custom_opts then
+      if type(custom_opts) == "function" then
+        custom_opts = custom_opts()
       end
 
-      local server = lspconfig[server_name]
-      if not server then
+      if type(custom_opts) == "table" then
+        opts = deep_merge(opts, custom_opts)
+      else
         notify(
-          string.format("mason-lspconfig: no lspconfig entry for %s", server_name),
+          string.format(
+            "mason-lspconfig: expected table from user.lsp.settings.%s, got %s",
+            server_name,
+            type(custom_opts)
+          ),
           vim.log.levels.WARN
         )
-        return
       end
+    end
 
-      server.setup(opts)
-    end,
-  }
+    local server = lspconfig[server_name]
+    if not server then
+      notify(
+        string.format("mason-lspconfig: no lspconfig entry for %s", server_name),
+        vim.log.levels.WARN
+      )
+      return
+    end
+
+    server.setup(opts)
+  end
+
+  if type(mason_lspconfig.setup_handlers) == "function" then
+    mason_lspconfig.setup_handlers { configure_server }
+    return
+  end
+
+  -- Fall back for older versions of mason-lspconfig that do not expose
+  -- `setup_handlers`. We best-effort configure the servers that are either
+  -- explicitly ensured or currently installed.
+  local ok, installed = pcall(mason_lspconfig.get_installed_servers)
+  local servers_to_setup = {}
+
+  if ok and type(installed) == "table" and next(installed) ~= nil then
+    servers_to_setup = installed
+  else
+    servers_to_setup = servers
+  end
+
+  for _, server_name in ipairs(servers_to_setup) do
+    configure_server(server_name)
+  end
 end
 
 return M
