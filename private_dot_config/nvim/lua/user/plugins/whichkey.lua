@@ -1,34 +1,15 @@
+---@type LazyPluginSpec
 local M = {
   "folke/which-key.nvim",
   event = "VeryLazy",
 }
 
 function M.config()
-  local mappings = {
-    q = { "<cmd>confirm q<CR>", "Quit" },
-    h = { "<cmd>nohlsearch<CR>", "NOHL" },
-    [";"] = { "<cmd>tabnew | terminal<CR>", "Term" },
-    v = { "<cmd>vsplit<CR>", "Split" },
-    b = { name = "Buffers" },
-    d = { name = "Debug" },
-    f = { name = "Find" },
-    g = { name = "Git" },
-    l = { name = "LSP" },
-    p = { name = "Plugins" },
-    t = { name = "Test" },
-    a = {
-      name = "Tab",
-      n = { "<cmd>$tabnew<cr>", "New Empty Tab" },
-      N = { "<cmd>tabnew %<cr>", "New Tab" },
-      o = { "<cmd>tabonly<cr>", "Only" },
-      h = { "<cmd>-tabmove<cr>", "Move Left" },
-      l = { "<cmd>+tabmove<cr>", "Move Right" },
-    },
-    T = { name = "Treesitter" },
-  }
+  -- `which-key` is the popup shown after hitting `<leader>`.  We tune the
+  -- preset so it focuses on our own mappings instead of the defaults.
+  local wk = require "which-key"
 
-  local which_key = require "which-key"
-  which_key.setup {
+  wk.setup {
     plugins = {
       marks = true,
       registers = true,
@@ -46,12 +27,11 @@ function M.config()
         g = false,
       },
     },
-    win= {
+    window = {
       border = "rounded",
       position = "bottom",
       padding = { 2, 2, 2, 2 },
     },
-    --ignore_missing = true,
     show_help = false,
     show_keys = false,
     disable = {
@@ -60,12 +40,41 @@ function M.config()
     },
   }
 
-  local opts = {
-    mode = "n", -- NORMAL mode
-    prefix = "<leader>",
+  -- Normal-mode leader menu -------------------------------------------------
+  -- Keep the specification close to the actual keymaps defined throughout the
+  -- config so the UI mirrors reality.  Each entry either describes a single
+  -- mapping (with `desc`) or marks an entire prefix as a group.
+  ---@type table<string, any>
+  local normal_mode = {
+    q = { "<cmd>confirm q<CR>", desc = "Quit Neovim" },
+    h = { "<cmd>nohlsearch<CR>", desc = "Clear search highlight" },
+    [";"] = { "<cmd>tabnew | terminal<CR>", desc = "Terminal tab" },
+    v = { "<cmd>vsplit<CR>", desc = "Vertical split" },
+    w = { "<cmd>lua vim.wo.wrap = not vim.wo.wrap<CR>", desc = "Toggle wrap" },
+    a = {
+      name = "Tabs",
+      n = { "<cmd>$tabnew<CR>", desc = "New empty tab" },
+      N = { "<cmd>tabnew %<CR>", desc = "Tab from file" },
+      o = { "<cmd>tabonly<CR>", desc = "Close other tabs" },
+      h = { "<cmd>-tabmove<CR>", desc = "Move tab left" },
+      l = { "<cmd>+tabmove<CR>", desc = "Move tab right" },
+    },
+    b = { name = "Buffers" },
+    f = { name = "Find" },
+    g = { name = "Git" },
+    l = { name = "LSP" },
+    p = {
+      name = "Project",
+      d = { "<cmd>cd %:p:h<CR>", desc = "CD to buffer dir" },
+    },
+    t = { name = "Test" },
+    T = { name = "Treesitter" },
   }
 
-  which_key.register(mappings, opts)
+  wk.register(normal_mode, {
+    mode = "n",
+    prefix = "<leader>",
+  })
 end
 
 return M
