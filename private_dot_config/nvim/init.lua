@@ -14,9 +14,10 @@ lazy_helper.spec "user.plugins.devicons"
 lazy_helper.spec "user.plugins.todo_comments"
 lazy_helper.spec "user.plugins.hardtime"
 lazy_helper.spec "user.plugins.whichkey"
-lazy_helper.spec "user.plugins.lspconfig" -- may not be needed at all now
+lazy_helper.spec "user.plugins.lspconfig"
 lazy_helper.spec "user.plugins.mason"
 -- lazy_helper.spec "user.plugins.none-ls"
+-- Nerd Font picker powered by Telescope / Nerdy.nvim.
 lazy_helper.spec "user.plugins.nerdy"
 lazy_helper.spec "user.plugins.treesitter"
 -- lazy_helper.spec "user.plugins.telescope"
