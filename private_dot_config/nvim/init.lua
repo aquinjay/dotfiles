@@ -23,6 +23,6 @@ lazy_helper.spec "user.plugins.treesitter"
 -- lazy_helper.spec "user.plugins.telescope"
 lazy_helper.spec "user.plugins.illuminate"
 lazy_helper.spec "user.plugins.indentline"
--- lazy_helper.spec "user.plugins.comment" -- vim 0.10 makes has native functionality for this now
+lazy_helper.spec "user.plugins.comment"
 
 require "user.lazy_init"
