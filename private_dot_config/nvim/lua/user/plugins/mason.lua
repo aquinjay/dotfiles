@@ -13,14 +13,82 @@ local M = {
   },
 }
 
----Merge two lists into a unique array while filtering out empty values.
----This lets us keep a sensible default LSP set while still allowing overrides
----from user configuration without installing duplicates.
----@param defaults string[]
----@param overrides string[]|string|nil
+---Utility trim helper that falls back when `vim.trim` is unavailable.
+---@param value string
+---@return string
+local function trim(value)
+  if vim and vim.trim then
+    return vim.trim(value)
+  end
+
+  return (value:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+---Small helper to safely emit notifications even when `vim.notify`
+---is overridden or unavailable (e.g. during headless validation).
+---@param message string
+---@param level integer
+local function notify(message, level)
+  if vim and vim.notify then
+    vim.notify(message, level)
+    return
+  end
+
+  local label = tostring(level)
+  if vim and vim.log and vim.log.levels then
+    for name, value in pairs(vim.log.levels) do
+      if value == level then
+        label = name
+        break
+      end
+    end
+  end
+
+  print(string.format("[mason-lspconfig][%s] %s", label, message))
+end
+
+---Normalise mixed input (string, table, or nil) into a list of strings.
+---@param value string|string[]|nil
 ---@return string[]
-local function merge_unique(defaults, overrides)
-  local merged = {}
+local function normalize_list(value)
+  if type(value) == "string" then
+    return { trim(value) }
+  end
+
+  if type(value) ~= "table" then
+    return {}
+  end
+
+  local result = {}
+  for _, entry in ipairs(value) do
+    if type(entry) == "string" then
+      local trimmed = trim(entry)
+      if trimmed ~= "" then
+        table.insert(result, trimmed)
+      end
+    end
+  end
+
+  return result
+end
+
+---Compose the effective ensure_installed list.
+---Supports default values, user additions, and opt-out lists to keep
+---local customisations out of version-controlled defaults.
+---@param defaults string[]
+---@param additions string[]
+---@param removals string[]
+---@return string[]
+local function build_server_list(defaults, additions, removals)
+  local remove_lookup = {}
+
+  for _, name in ipairs(removals) do
+    if type(name) == "string" then
+      remove_lookup[trim(name)] = true
+    end
+  end
+
+  local result = {}
   local seen = {}
 
   local function add(value)
@@ -28,28 +96,51 @@ local function merge_unique(defaults, overrides)
       return
     end
 
-    local trimmed = vim.trim(value)
-    if trimmed ~= "" and not seen[trimmed] then
-      table.insert(merged, trimmed)
-      seen[trimmed] = true
+    local trimmed = trim(value)
+    if trimmed == "" or remove_lookup[trimmed] or seen[trimmed] then
+      return
     end
+
+    table.insert(result, trimmed)
+    seen[trimmed] = true
   end
 
   for _, value in ipairs(defaults) do
     add(value)
   end
 
-  if type(overrides) == "string" then
-    overrides = { overrides }
+  for _, value in ipairs(additions) do
+    add(value)
   end
 
-  if type(overrides) == "table" then
-    for _, value in ipairs(overrides) do
-      add(value)
+  return result
+end
+
+---Merge a user override table into default options.
+---@param base table
+---@param override table
+---@return table
+local function deep_merge(base, override)
+  if type(override) ~= "table" or next(override) == nil then
+    return base
+  end
+
+  if vim and vim.tbl_deep_extend then
+    local ok, merged = pcall(vim.tbl_deep_extend, "force", base, override)
+    if ok then
+      return merged
     end
   end
 
-  return merged
+  for key, value in pairs(override) do
+    if type(value) == "table" and type(base[key]) == "table" then
+      base[key] = deep_merge(base[key], value)
+    else
+      base[key] = value
+    end
+  end
+
+  return base
 end
 
 
@@ -62,15 +153,21 @@ function M.config()
     "jsonls",   -- JSON language server with schema support.
   }
 
-  -- Allow the list to be extended or trimmed via a global.
-  -- Example: vim.g.mason_lsp_servers = { "tsserver", "gopls" }
-  local user_servers = rawget(vim.g, "mason_lsp_servers")
-  local servers = merge_unique(default_servers, user_servers)
+  -- Allow the list to be extended or trimmed via globals.
+  -- Examples:
+  --   vim.g.mason_lsp_servers = { "tsserver", "gopls" }
+  --   vim.g.mason_lsp_servers_remove = { "jsonls" }
+  local additions = normalize_list(rawget(vim.g, "mason_lsp_servers"))
+  local removals = normalize_list(
+    rawget(vim.g, "mason_lsp_servers_remove")
+      or rawget(vim.g, "mason_lsp_servers_exclude")
+  )
+  local servers = build_server_list(default_servers, additions, removals)
 
   -- Mason core setup -------------------------------------------------------
   local mason_ok, mason = pcall(require, "mason")
   if not mason_ok then
-    vim.notify("mason.nvim is not available", vim.log.levels.ERROR)
+    notify("mason.nvim is not available", vim.log.levels.ERROR)
     return
   end
 
@@ -90,7 +187,7 @@ function M.config()
   -- Mason-LSPconfig bridge -------------------------------------------------
   local mason_lsp_ok, mason_lspconfig = pcall(require, "mason-lspconfig")
   if not mason_lsp_ok then
-    vim.notify("mason-lspconfig.nvim is not available", vim.log.levels.ERROR)
+    notify("mason-lspconfig.nvim is not available", vim.log.levels.ERROR)
     return
   end
 
@@ -115,10 +212,34 @@ function M.config()
 
       local has_custom_opts, custom_opts = pcall(require, "user.lsp.settings." .. server_name)
       if has_custom_opts then
-        opts = vim.tbl_deep_extend("force", opts, custom_opts)
+        if type(custom_opts) == "function" then
+          custom_opts = custom_opts()
+        end
+
+        if type(custom_opts) == "table" then
+          opts = deep_merge(opts, custom_opts)
+        else
+          notify(
+            string.format(
+              "mason-lspconfig: expected table from user.lsp.settings.%s, got %s",
+              server_name,
+              type(custom_opts)
+            ),
+            vim.log.levels.WARN
+          )
+        end
       end
 
-      lspconfig[server_name].setup(opts)
+      local server = lspconfig[server_name]
+      if not server then
+        notify(
+          string.format("mason-lspconfig: no lspconfig entry for %s", server_name),
+          vim.log.levels.WARN
+        )
+        return
+      end
+
+      server.setup(opts)
     end,
   }
 end
