@@ -13,23 +13,113 @@ local M = {
   },
 }
 
+---Merge two lists into a unique array while filtering out empty values.
+---This lets us keep a sensible default LSP set while still allowing overrides
+---from user configuration without installing duplicates.
+---@param defaults string[]
+---@param overrides string[]|string|nil
+---@return string[]
+local function merge_unique(defaults, overrides)
+  local merged = {}
+  local seen = {}
+
+  local function add(value)
+    if type(value) ~= "string" then
+      return
+    end
+
+    local trimmed = vim.trim(value)
+    if trimmed ~= "" and not seen[trimmed] then
+      table.insert(merged, trimmed)
+      seen[trimmed] = true
+    end
+  end
+
+  for _, value in ipairs(defaults) do
+    add(value)
+  end
+
+  if type(overrides) == "string" then
+    overrides = { overrides }
+  end
+
+  if type(overrides) == "table" then
+    for _, value in ipairs(overrides) do
+      add(value)
+    end
+  end
+
+  return merged
+end
+
 
 function M.config()
-  local servers = {
-    "lua_ls",
-    "pyright",
-    "bashls",
-    "jsonls",
+  -- Default language servers that should always be installed.
+  local default_servers = {
+    "lua_ls",   -- Lua language server for Neovim development.
+    "pyright",  -- Type checker and language server for Python.
+    "bashls",   -- Bash language server for shell scripting.
+    "jsonls",   -- JSON language server with schema support.
   }
 
-  require("mason").setup {
+  -- Allow the list to be extended or trimmed via a global.
+  -- Example: vim.g.mason_lsp_servers = { "tsserver", "gopls" }
+  local user_servers = rawget(vim.g, "mason_lsp_servers")
+  local servers = merge_unique(default_servers, user_servers)
+
+  -- Mason core setup -------------------------------------------------------
+  local mason_ok, mason = pcall(require, "mason")
+  if not mason_ok then
+    vim.notify("mason.nvim is not available", vim.log.levels.ERROR)
+    return
+  end
+
+  mason.setup {
     ui = {
-      border = "rounded",
+      border = "rounded", -- Consistent floating window borders.
+      check_outdated_packages_on_open = true, -- Surface outdated tools early.
+      icons = {
+        package_installed = "",
+        package_pending = "",
+        package_uninstalled = "",
+      },
     },
+    max_concurrent_installers = 4, -- Keep installer throughput high but safe.
   }
 
-  require("mason-lspconfig").setup {
-    ensure_installed = servers,
+  -- Mason-LSPconfig bridge -------------------------------------------------
+  local mason_lsp_ok, mason_lspconfig = pcall(require, "mason-lspconfig")
+  if not mason_lsp_ok then
+    vim.notify("mason-lspconfig.nvim is not available", vim.log.levels.ERROR)
+    return
+  end
+
+  mason_lspconfig.setup {
+    ensure_installed = servers, -- Auto-install both defaults and user additions.
+    automatic_installation = true, -- Ensure new servers are fetched on demand.
+  }
+
+  -- Optional handler auto-setup --------------------------------------------
+  -- If nvim-lspconfig is available we register a generic handler so any
+  -- server installed through Mason is automatically initialised. Users can
+  -- override individual server settings by creating
+  -- `user/lsp/settings/<server>.lua` modules that return option tables.
+  local lspconfig_ok, lspconfig = pcall(require, "lspconfig")
+  if not lspconfig_ok then
+    return -- Nothing more to do if the LSP client isn't present.
+  end
+
+  mason_lspconfig.setup_handlers {
+    function(server_name)
+      local opts = {}
+
+      local has_custom_opts, custom_opts = pcall(require, "user.lsp.settings." .. server_name)
+      if has_custom_opts then
+        opts = vim.tbl_deep_extend("force", opts, custom_opts)
+      end
+
+      lspconfig[server_name].setup(opts)
+    end,
   }
 end
 
