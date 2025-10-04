@@ -20,13 +20,10 @@ function M.config()
   -- comment action.  `<Plug>` mappings are used so Comment.nvim stays in
   -- control of the implementation details.
   local wk = require "which-key"
-  wk.register {
-    ["<leader>/"] = { "<Plug>(comment_toggle_linewise_current)", "Comment" },
-  }
-
-  wk.register {
-    ["<leader>/"] = { "<Plug>(comment_toggle_linewise_visual)", "Comment", mode = "v" },
-  }
+  wk.add({
+    { "<leader>/", "<Plug>(comment_toggle_linewise_current)", desc = "Comment", mode = "n" },
+    { "<leader>/", "<Plug>(comment_toggle_linewise_visual)", desc = "Comment", mode = "v" },
+  })
 
   -- Comment.nvim handles integration with ts-context-commentstring itself, so
   -- we disable the built-in autocmd and wire the hook manually below.
