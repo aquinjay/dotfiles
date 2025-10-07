@@ -21,7 +21,6 @@ function M.config()
   -- the identifiers used by `nvim-lspconfig`.
   local servers = {
     "lua_ls",
-    "pyright",
     "bashls",
     "jsonls",
   }
