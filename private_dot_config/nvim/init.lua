@@ -25,6 +25,6 @@ lazy_helper.spec "user.plugins.telescope"
 lazy_helper.spec "user.plugins.illuminate"
 lazy_helper.spec "user.plugins.indentline"
 lazy_helper.spec "user.plugins.comment"
-lazy_helper.spec "user.plugins.neo-tree"
+--lazy_helper.spec "user.plugins.neo-tree"
 
 require "user.lazy_init"
