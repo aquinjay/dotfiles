@@ -1,87 +1,59 @@
---- @file none-ls.lua
---- @brief Configure the `nvimtools/none-ls.nvim` plugin to expose external
---- formatters and linters through Neovim's built-in LSP client.
+
+---@type LazyPluginSpec
 local M = {
   "nvimtools/none-ls.nvim",
-  dependencies = {
-    "nvim-lua/plenary.nvim", -- Required runtime dependency for none-ls
-  },
-  event = { "BufReadPre", "BufNewFile" }, -- Lazily load when editing files
+  dependencies = { "nvim-lua/plenary.nvim" },
+  event = { "BufReadPre", "BufNewFile" },
 }
 
 function M.config()
-  ---@type table<string, any>
   local null_ls = require "null-ls"
+  local f = null_ls.builtins.formatting
+  local d = null_ls.builtins.diagnostics
 
-  -- Extract helpers for readability and to avoid repeating `null_ls.builtins`
-  local formatting = null_ls.builtins.formatting
-  local diagnostics = null_ls.builtins.diagnostics
-  local code_actions = null_ls.builtins.code_actions
-  local utils = require "null-ls.utils"
-
-  ---Create a convenience wrapper that keeps a source inactive when its backing
-  ---executable is not available on the system. This prevents none-ls from
-  ---spamming errors when a formatter/linter is missing.
-  ---@param source null-ls.Source
-  ---@param command string|nil
-  local function with_executable(source, command)
+  -- Helper: only enable if tool exists
+  local function enable_if_exec(source, cmd)
+    if not source then return nil end
     return source.with {
-      condition = function()
-        return utils.is_executable(command or source._opts.command)
-      end,
+      condition = function() return vim.fn.executable(cmd) == 1 end,
     }
   end
 
-  ---Restrict a source to projects that provide explicit configuration files.
-  ---This keeps formatters like Stylua or Prettier from running on arbitrary
-  ---projects that may not expect them.
-  ---@param source null-ls.Source
-  ---@param files string|string[]
-  local function with_root_file(source, files)
+  -- Helper: only enable if project declares config file
+  local function enable_if_root_file(source, files)
+    if not source then return nil end
     return source.with {
-      condition = function()
-        return utils.root_has_file(files)
-      end,
+      condition = function(utils) return utils.root_has_file(files) end,
     }
   end
 
-  local sources = {
-    -- Lua formatting only when a Stylua config is present
-    with_root_file(formatting.stylua, { "stylua.toml", ".stylua.toml" }),
-
-    -- JavaScript/TypeScript formatting using Prettierd when installed
-    with_executable(formatting.prettierd, "prettierd"),
-
-    -- Python formatters/linters (require the binaries in your PATH)
-    with_executable(formatting.black.with { extra_args = { "--fast" } }, "black"),
-    with_executable(formatting.isort, "isort"),
-    with_executable(diagnostics.flake8, "flake8"),
-
-    -- Shell integration
-    with_executable(formatting.shfmt.with { extra_args = { "-i", "2", "-ci" } }, "shfmt"),
-    with_executable(diagnostics.shellcheck, "shellcheck"),
-
-    -- Git aware code actions (requires gitsigns dependency to be useful)
-    code_actions.gitsigns,
+  -- Current minimal setup
+  local wanted = {
+    enable_if_root_file(f.stylua, { "stylua.toml", ".stylua.toml" }),
+    enable_if_exec(d.ruff, "ruff"),
+    enable_if_exec(f.ruff, "ruff"),
   }
 
-  local formatting_augroup = vim.api.nvim_create_augroup("NoneLsFormatting", { clear = true })
+  local sources = {}
+  for _, s in ipairs(wanted) do
+    if s then table.insert(sources, s) end
+  end
+
+  local aug = vim.api.nvim_create_augroup("NoneLsFormat", { clear = true })
 
   null_ls.setup {
-    debug = false, -- Enable for verbose logging if you need to troubleshoot
+    debug = false,
     sources = sources,
     on_attach = function(client, bufnr)
-      -- Register a buffer-local format-on-save autocmd whenever the source
-      -- advertises the formatting capability.
       if client.supports_method "textDocument/formatting" then
-        vim.api.nvim_clear_autocmds { group = formatting_augroup, buffer = bufnr }
+        vim.api.nvim_clear_autocmds { group = aug, buffer = bufnr }
         vim.api.nvim_create_autocmd("BufWritePre", {
-          group = formatting_augroup,
+          group = aug,
           buffer = bufnr,
           callback = function()
             vim.lsp.buf.format { bufnr = bufnr, async = false }
           end,
-          desc = "Format with none-ls before saving the buffer",
+          desc = "Format via none-ls on save",
         })
       end
     end,
