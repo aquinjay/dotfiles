@@ -20,7 +20,7 @@ lazy_helper.spec "user.plugins.none-ls"
 -- Nerd Font picker powered by Telescope / Nerdy.nvim.
 lazy_helper.spec "user.plugins.nerdy"
 lazy_helper.spec "user.plugins.treesitter"
-lazy_helper.spec "user.plugins.neovim_project
+lazy_helper.spec "user.plugins.neovim_project"
 lazy_helper.spec "user.plugins.telescope"
 lazy_helper.spec "user.plugins.illuminate"
 lazy_helper.spec "user.plugins.indentline"
