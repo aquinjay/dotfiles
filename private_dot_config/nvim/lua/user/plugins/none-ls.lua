@@ -78,8 +78,6 @@ function M.config()
   -- Current minimal setup
   local wanted = {
     enable_if_root_file(f.stylua, { "stylua.toml", ".stylua.toml" }),
-    enable_if_exec(d.ruff, "ruff"),
-    enable_if_exec(f.ruff, "ruff"),
   }
 
   local sources = {}
