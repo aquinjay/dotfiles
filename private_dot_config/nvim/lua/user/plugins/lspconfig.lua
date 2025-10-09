@@ -1,17 +1,17 @@
 -- lua/user/plugins/lspconfig.lua
 -- ============================================================================
--- 🧭 QUICK REFERENCE — LSP (lua_ls focused)
+-- 🧭 QUICK REFERENCE — LSP (Lua, TypeScript, Vue)
 --
 -- What this file does
---   • Configures the Lua language server using Neovim’s core API
---     (vim.lsp.config / vim.lsp.enable), not lspconfig’s sugar.
---   • Injects nvim-cmp completion capabilities so snippet/doc features show up.
---   • Enables inlay hints automatically when the server supports them.
---   • Allows optional user overrides in `user.plugins.lspsettings.lua_ls`.
+--   • Configures multiple language servers (Lua, TS/JS, Vue) via Neovim’s core API.
+--   • Keeps Lua, Volar (Vue), and VTSLS (TS/JS) separate—no conflicts.
+--   • Injects nvim-cmp completion capabilities + inlay hints.
+--   • Optional per-server overrides live in user.plugins.lspsettings/*.lua
 --
--- Typical check:
---   • :LspInfo → “lua_ls” attached when editing Lua.
---   • Hover/definitions work; completion menu is driven by nvim-cmp.
+-- Quick checks:
+--   • :LspInfo → “lua_ls” for Lua buffers
+--   • :LspInfo → “vtsls” for TS/JS files
+--   • :LspInfo → “volar”  for .vue files
 -- ============================================================================
 
 local M = {
@@ -21,22 +21,20 @@ local M = {
     dependencies = {
       {
         "folke/lazydev.nvim",
-        ft = "lua", -- only load on lua files
+        ft = "lua",
         opts = {
           library = {
             { path = "${3rd}/luv/library", words = { "vim%.uv" } },
           },
         },
       },
-      -- NOTE: cmp-nvim-lsp is declared in your cmp spec; we *optionally* require it below.
-      -- "hrsh7th/cmp-nvim-lsp",
     },
+
     config = function()
-      -- Reuse lspconfig's root helpers
       local util = require "lspconfig.util"
 
       ------------------------------------------------------------------------
-      -- Capabilities — prefer cmp’s defaults; fall back to snippetSupport only
+      -- Capabilities — prefer cmp’s defaults; fallback to snippetSupport only
       ------------------------------------------------------------------------
       local capabilities
       local ok_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
@@ -57,31 +55,28 @@ local M = {
       end
 
       ------------------------------------------------------------------------
-      -- Optional user overrides (your existing pattern)
+      -- LUA_LS  --------------------------------------------------------------
       ------------------------------------------------------------------------
       local settings = {}
       local ok, lua_settings = pcall(require, "user.plugins.lspsettings.lua_ls")
       if ok then settings = lua_settings end
 
-      -- Compose final config (keep your structure intact)
-      local config = vim.tbl_deep_extend("force", {
+      local lua_cfg = vim.tbl_deep_extend("force", {
         cmd = { "lua-language-server" },
         filetypes = { "lua" },
-        root_dir = function(fname)
-          return util.root_pattern(
-            ".luarc.json",
-            ".luarc.jsonc",
-            ".luacheckrc",
-            ".stylua.toml",
-            "stylua.toml",
-            "selene.toml",
-            "selene.yml",
-            ".git"
-          )(fname) or vim.fn.getcwd()
-        end,
+        root_dir = util.root_pattern(
+          ".luarc.json",
+          ".luarc.jsonc",
+          ".luacheckrc",
+          ".stylua.toml",
+          "stylua.toml",
+          "selene.toml",
+          "selene.yml",
+          ".git"
+        ),
         single_file_support = true,
-        capabilities = capabilities,  -- ✅ cmp capabilities
-        on_attach = on_attach,        -- ✅ inlay hints hook
+        capabilities = capabilities,
+        on_attach = on_attach,
         settings = {
           Lua = {
             workspace = { checkThirdParty = false },
@@ -90,14 +85,67 @@ local M = {
         },
       }, settings)
 
-      -- Register + enable via the core API (your original approach)
-      vim.lsp.config("lua_ls", config)
+      vim.lsp.config("lua_ls", lua_cfg)
       vim.api.nvim_create_autocmd("FileType", {
-        pattern = config.filetypes,
+        pattern = lua_cfg.filetypes,
         callback = function() vim.lsp.enable("lua_ls") end,
+      })
+
+      ------------------------------------------------------------------------
+      -- VTSLS (TypeScript / JavaScript / TSX) -------------------------------
+      ------------------------------------------------------------------------
+      local ok_vts, vts = pcall(require, "user.plugins.lspsettings.vtsls")
+      local vts_cfg = {
+        cmd = { "vtsls" },
+        filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+        root_dir = util.root_pattern("tsconfig.json", "jsconfig.json", "package.json", ".git"),
+        single_file_support = true,
+        capabilities = capabilities,
+        on_attach = on_attach,
+        settings = ok_vts and vts.settings or {},
+      }
+      vim.lsp.config("vtsls", vts_cfg)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = vts_cfg.filetypes,
+        callback = function() vim.lsp.enable("vtsls") end,
+      })
+
+      ------------------------------------------------------------------------
+      -- VOLAR (Vue 3 SFCs + Templates + Vuetify) ----------------------------
+      ------------------------------------------------------------------------
+      local ok_volar, vol = pcall(require, "user.plugins.lspsettings.volar")
+      local tsdk = ""
+      do
+        local ts_path = util.path.join(vim.loop.cwd() or "", "node_modules", "typescript", "lib")
+        if vim.loop.fs_stat(ts_path) then tsdk = ts_path end
+      end
+
+      local volar_cfg = {
+        cmd = { "vue-language-server", "--stdio" },
+        filetypes = { "vue" },
+        root_dir = util.root_pattern(
+          "pnpm-workspace.yaml",
+          "yarn.lock",
+          "package-lock.json",
+          "package.json",
+          ".git"
+        ),
+        single_file_support = true,
+        capabilities = capabilities,
+        on_attach = on_attach,
+        settings = ok_volar and vol.settings or {
+          vue = { format = { enable = true } },
+          typescript = { tsdk = tsdk },
+        },
+      }
+      vim.lsp.config("volar", volar_cfg)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = volar_cfg.filetypes,
+        callback = function() vim.lsp.enable("volar") end,
       })
     end,
   },
 }
 
 return M
+

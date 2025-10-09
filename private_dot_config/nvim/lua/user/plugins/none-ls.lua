@@ -2,51 +2,48 @@
 -- ============================================================================
 -- 🧭 QUICK REFERENCE — "none-ls" (formerly null-ls)
 --
--- Q: What is this file?
--- A: It wires external formatters & linters into Neovim’s LSP system so they
---    behave like language servers (same diagnostics, same format-on-save).
+-- ▸ What this does
+--   Bridges external formatters and linters into Neovim’s LSP system so they
+--   act like normal language servers (same diagnostics, same format-on-save).
 --
--- Q: What tools does it run?
--- A: Right now only two:
---      • stylua → formats Lua (only if stylua.toml exists)
---      • ruff   → lints + formats Python (only if ruff binary is found)
+-- ▸ Active tools
+--   • stylua → formats Lua (only if stylua.toml exists)
+--   • biome  → formats JS/TS/JSON/CSS/GraphQL (only if biome.json/jsonc exists)
 --
--- Q: Where do these tools come from?
--- A: Mason can install them (`:Mason` → select “stylua” / “ruff”), or you can
---    install manually via pipx / cargo / system package manager.
+-- ▸ Where they come from
+--   Mason can install them (`:Mason` → stylua / biome)  
+--   or install manually:
+--     - stylua: cargo install stylua
+--     - biome:  npm i -g @biomejs/biome
 --
--- Q: How do I check if they’re visible to Neovim?
--- A: Inside Neovim:
---        :echo executable("ruff")
---        :echo executable("stylua")
---    Each should print `1`.  If `0`, Neovim can’t find it on $PATH.
+-- ▸ Quick checks
+--     :echo executable("stylua")
+--     :echo executable("biome")
+--   → should print `1`; `0` means Neovim can’t find it on $PATH.
 --
--- Q: What happens when I save a file?
--- A: If the attached LSP client supports formatting, none-ls runs its formatter
---    right before write (`BufWritePre`).  Lua files use stylua; Python uses ruff.
+-- ▸ How formatting runs
+--   If an attached client supports `textDocument/formatting`, none-ls hooks
+--   `BufWritePre` and runs the formatter just before write.
 --
--- Q: Where are the rules / settings?
--- A: Each tool reads its own config:
---        • stylua → stylua.toml or .stylua.toml
---        • ruff   → pyproject.toml under [tool.ruff] / [tool.ruff.format]
+-- ▸ Where configs live
+--   • stylua → stylua.toml or .stylua.toml  
+--   • biome  → biome.json or biome.jsonc
 --
--- Q: How do I add another language later?
--- A: 1. Install the CLI tool (e.g., shfmt, eslint_d, black, etc.).
---    2. In “wanted” below, copy one of the helper lines:
---         enable_if_exec(null_ls.builtins.formatting.shfmt, "shfmt")
---    3. Save → reload → done.
+-- ▸ Adding more tools later
+--   1. Install the CLI tool (e.g., shfmt, black, prettier).  
+--   2. Copy one of the helper patterns in “wanted” below.  
+--   3. Save → reload → done.
 --
--- Q: How do I debug when nothing runs?
--- A: `:NoneLsInfo` shows active sources per buffer.
---    `:checkhealth` verifies the executables.
+-- ▸ Debugging
+--   • :NoneLsInfo    → shows active sources per buffer
+--   • :checkhealth   → checks executables on PATH
 --
--- Typical workflow:
---   1. Open a file.
---   2. None-ls attaches (you’ll see it in :LspInfo).
---   3. On save → formatter runs.
---   4. Ruff/stylua warnings show inline like normal diagnostics.
---
+-- Typical flow:
+--   open → none-ls attaches → save → formatter runs → done.
 -- ============================================================================
+
+
+
 ---@type LazyPluginSpec
 local M = {
   "nvimtools/none-ls.nvim",
@@ -78,6 +75,7 @@ function M.config()
   -- Current minimal setup
   local wanted = {
     enable_if_root_file(f.stylua, { "stylua.toml", ".stylua.toml" }),
+    enable_if_root_file(f.biome,{ "biome.json", "biome.jsonc" })
   }
 
   local sources = {}
