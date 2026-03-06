@@ -1,7 +1,9 @@
--- Vue/TS stack: vtsls handles TS/JS(/TSX). Volar will handle .vue
+-- Core purpose: shared config for the vtsls server.
+-- - filetypes: which buffers should attach to vtsls (includes vue so vue_ls can find TS)
+-- - settings: inlay hints + completion preferences for TS/JS
 local M = {}
 
-M.filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" }
+M.filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact", "vue" }
 
 M.settings = {
   typescript = {
@@ -27,4 +29,3 @@ M.settings = {
 }
 
 return M
-
