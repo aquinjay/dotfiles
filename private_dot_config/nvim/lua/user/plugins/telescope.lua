@@ -143,16 +143,13 @@ return {
         },
 
         -- ✅ UI-Select: theme small choice menus nicely
-        ["ui-select"] = function()
-          local theme = require("telescope.themes").get_dropdown {
-            winblend = 0,                -- keep text crisp
-            layout_config = { width = 0.60, height = 0.45, prompt_position = "top" },
-            previewer = false,
-            sorting_strategy = "ascending",
-            borderchars = rounded,
-          }
-          return theme
-        end,
+["ui-select"] = require("telescope.themes").get_dropdown({
+  winblend = 0,
+  layout_config = { width = 0.60, height = 0.45, prompt_position = "top" },
+  previewer = false,
+  sorting_strategy = "ascending",
+  borderchars = rounded,
+})
       },
     }
   end,
