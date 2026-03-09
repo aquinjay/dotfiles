@@ -18,7 +18,7 @@ Each file in **`lua/user/plugins/`** returns a Lazy plugin specification table. 
 - `cmp.lua` – configures autocompletion (`nvim-cmp`, `LuaSnip`, and related sources).
 - `lspconfig.lua` & `mason.lua` – integrate the LSP client with Mason for easy language-server installs. Mason handles server downloads, while `lspconfig.lua` wires the servers into Neovim when they are available.
 - `treesitter.lua` – enables syntax-aware highlighting and text objects.
-- `lualine.lua`, `devicons.lua`, `indentline.lua`, `todo_comments.lua`, `hardtime.lua`, etc. – provide UI niceties, productivity helpers, and extra diagnostics.
+- `lualine.lua`, `devicons.lua`, `alpha.lua`, `indentline.lua`, `todo_comments.lua`, `hardtime.lua`, etc. – provide UI niceties, productivity helpers, and extra diagnostics.
 
 Some plugin specs (such as `whichkey.lua`, `telescope.lua`, `comment.lua`, and `none-ls.lua`) are present but not currently imported in `init.lua`. To enable them, uncomment the corresponding `lazy_helper.spec` line. The `old_lspconfig.lua` file is kept for reference but is not used.
 
@@ -45,6 +45,8 @@ Everything else in `init.lua` is cosmetic or workflow sugar: feel free to disabl
 1. Create a new file in `lua/user/plugins/` that returns a Lazy spec for the plugin you want to add.
 2. Add `lazy_helper.spec "user.plugins.your_file"` to `init.lua`.
 3. Restart Neovim; Lazy.nvim will install the plugin on the next launch.
+
+Example: `alpha.lua` follows this exact pattern and is enabled through `lazy_helper.spec "user.plugins.alpha"` in `init.lua`.
 
 ## Repository Notes
 - `lazy-lock.json` records exact plugin commits to keep installations reproducible.
