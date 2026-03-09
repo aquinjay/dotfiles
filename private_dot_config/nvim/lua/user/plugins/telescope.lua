@@ -33,12 +33,12 @@ return {
 
     wk.add({
       { "<leader>f",  group = "Find" },
-      { "<leader>ff", tb("find_files", { previewer = false }),                 desc = "Find files" },
+      { "<leader>ff", tb("find_files", { previewer = true }),                 desc = "Find files" },
       { "<leader>ft", "<cmd>Telescope live_grep<cr>",                          desc = "Find text (ripgrep)" },
       { "<leader>fh", "<cmd>Telescope help_tags<cr>",                          desc = "Help" },
       { "<leader>fl", "<cmd>Telescope resume<cr>",                             desc = "Last search" },
       { "<leader>fr", "<cmd>Telescope oldfiles<cr>",                           desc = "Recent files" },
-      { "<leader>fb", "<cmd>Telescope git_branches<cr>",                       desc = "Checkout branch" },
+      { "<leader>fgb", "<cmd>Telescope git_branches<cr>",                       desc = "Checkout branch" },
 
       { "<leader>b",  group = "Buffers" },
       { "<leader>bb", tb("buffers", { }),                                      desc = "Buffers" },
@@ -85,11 +85,19 @@ return {
           results = rounded,
           preview = rounded,
         },
-
         vimgrep_arguments = {
-          "rg","-uu","--color=never","--no-heading","--with-filename","--line-number","--column",
-          "--smart-case","--hidden","--glob=!.git/",
+          "rg",
+          "--color=never",
+          "--no-heading",
+          "--with-filename",
+          "--line-number",
+          "--column",
+          "--smart-case",
+          "--hidden",
+          "--glob=!.git/"
         },
+
+
 
         mappings = {
           i = {
@@ -109,15 +117,15 @@ return {
 
       pickers = {
         find_files = {
-          previewer = false,
-          find_command = { "rg", "--files", "--hidden", "--glob", "!.git/" },
+          previewer = true,
+          find_command = { "fd", "--type","f", "--hidden", "--exclude", ".git" },
         },
         live_grep   = { },
         grep_string = { },
 
         buffers = {
           theme = "dropdown",
-          previewer = false,
+          previewer = true,
           initial_mode = "normal",
           sort_lastused = true,
           mappings = {
@@ -146,7 +154,7 @@ return {
 ["ui-select"] = require("telescope.themes").get_dropdown({
   winblend = 0,
   layout_config = { width = 0.60, height = 0.45, prompt_position = "top" },
-  previewer = false,
+  previewer = true,
   sorting_strategy = "ascending",
   borderchars = rounded,
 })
