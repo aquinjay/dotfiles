@@ -23,6 +23,7 @@
 ---@type LazyPluginSpec
 local M = {
   "nvim-treesitter/nvim-treesitter",
+  branch="main",
   event = { "BufReadPost", "BufNewFile" },
   build = ":TSUpdate",
 }
