@@ -10,8 +10,9 @@ function M.config()
   local illuminate = require("illuminate")
 
   illuminate.configure {
-    -- Try LSP-powered references first, fall back to Treesitter, then plain text.
-    providers = { "lsp", "treesitter", "regex" },
+    -- Try LSP-powered references first, then fall back to plain text.
+    -- The Treesitter provider is disabled to avoid crashes in nvim-treesitter locals.
+    providers = { "lsp", "regex" },
 
     -- A small delay keeps the highlights from flashing while you move quickly.
     delay = 150,
