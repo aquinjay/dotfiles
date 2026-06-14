@@ -23,16 +23,17 @@ function M.config()
       "Trouble",
       "text",
     },
-    -- Use a thin vertical line for both regular and context guides.
+    -- Use a thin vertical line for regular indent guides.
     char = icons.ui.LineMiddle,
     context_char = icons.ui.LineMiddle,
     -- Hide visual clutter while still keeping the first indent visible.
     show_trailing_blankline_indent = false,
     show_first_indent_level = true,
-    -- Rely on Treesitter to detect scope boundaries and highlight them.
-    use_treesitter = true,
-    show_current_context = true,
-    show_current_context_start = true,
+    -- Avoid Treesitter-backed scope detection here. Mixed-language files such
+    -- as Vue can trigger nvim-treesitter indent/query predicate crashes.
+    use_treesitter = false,
+    show_current_context = false,
+    show_current_context_start = false,
   }
 
   -- Allow quickly toggling guides when the extra detail is distracting.

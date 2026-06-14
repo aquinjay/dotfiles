@@ -80,9 +80,13 @@ function M.config()
     },
 
     -- Indentation (parser-specific; falls back gracefully where unsupported)
+    -- Vue indentation is disabled because its mixed-language queries can crash
+    -- through nvim-treesitter indent/query predicates while editing .vue files.
     indent = {
       enable = true,
-      disable = function(lang, buf) return too_large(lang, buf) end,
+      disable = function(lang, buf)
+        return lang == "vue" or too_large(lang, buf)
+      end,
     },
 
     -- Incremental selection (super handy for refactors)
