@@ -592,6 +592,7 @@ SUPER + Shift + V      clipboard history
 SUPER + Alt + V        delete from clipboard history
 SUPER + N              notification panel
 SUPER + Shift + N      do not disturb
+SUPER + Shift + W      pick wallpaper + re-theme everything
 SUPER + Q              close window
 SUPER + F              fullscreen
 SUPER + V              float/tile
@@ -682,6 +683,21 @@ Everything you copy (text and images) is remembered.
 
 The bell in the bar shows the unread count: left-click opens the panel, right-click toggles do-not-disturb.
 Config: `~/.config/swaync/config.json`.
+
+---
+
+## Wallpaper Theme (matugen)
+
+`SUPER + Shift + W` opens a thumbnail grid of wallpapers. Picking one sets it and
+regenerates the colors of everything from it: window borders (animated gradient),
+waybar, rofi, notifications, the lock screen and alacritty.
+
+- Wallpapers are read from `~/Pictures/Wallpapers/` (put your own here) and the CachyOS set.
+- From a terminal: `~/.config/hypr/scripts/wallpaper.sh /path/to/image.jpg`
+- How it works: `matugen` fills the templates in `~/.config/matugen/templates/` and writes
+  `colors.*` files next to each app's config. Edit the **templates**, not the generated files.
+- The generated `colors.*` files are not in chezmoi. After restoring dotfiles on a new
+  machine, run the wallpaper script once to create them.
 
 ---
 

@@ -1,0 +1,31 @@
+# matugen: generates a color theme from the wallpaper and writes it into each app.
+# Run via ~/.config/hypr/scripts/wallpaper.sh (SUPER + SHIFT + W), not by hand.
+
+[config]
+
+[templates.hyprland]
+input_path = '~/.config/matugen/templates/hyprland-colors.lua'
+output_path = '~/.config/hypr/colors.lua'
+post_hook = 'hyprctl reload >/dev/null'
+
+[templates.hyprlock]
+input_path = '~/.config/matugen/templates/hyprlock-colors.conf'
+output_path = '~/.config/hypr/hyprlock-colors.conf'
+
+[templates.waybar]
+input_path = '~/.config/matugen/templates/waybar-colors.css'
+output_path = '~/.config/waybar/colors.css'
+post_hook = 'pkill -SIGUSR2 -x waybar'
+
+[templates.rofi]
+input_path = '~/.config/matugen/templates/rofi-colors.rasi'
+output_path = '~/.config/rofi/colors.rasi'
+
+[templates.swaync]
+input_path = '~/.config/matugen/templates/swaync-style.css'
+output_path = '~/.config/swaync/style.css'
+post_hook = 'swaync-client -rs >/dev/null'
+
+[templates.alacritty]
+input_path = '~/.config/matugen/templates/alacritty-colors.toml'
+output_path = '~/.config/alacritty/colors.toml'
