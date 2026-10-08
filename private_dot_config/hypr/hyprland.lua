@@ -11,9 +11,10 @@ local terminal = "alacritty"
 local idlehandler = "hypridle" -- settings in ~/.config/hypr/hypridle.conf
 
 -- Screenshots
-local shot_region = "grimblast copy area"
-local shot_window = "grimblast copy active"
-local shot_screen = "grimblast copy output"
+local shot_region = [[grimblast -n copysave area ~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png]]
+local shot_window = [[grimblast -n copysave active ~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png]]
+local shot_screen = [[grimblast -n copysave output ~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png]]
+local shot_annotate = [[grimblast save area - | swappy -f -]] -- swappy settings: ~/.config/swappy/config
 
 -- Colors
 local cachylgreen = "rgba(82dcccff)"
@@ -224,6 +225,9 @@ exec(mainMod .. " + ALT + V", [[cliphist list | wofi --dmenu --prompt "delete fr
 exec("Print", shot_region)
 exec("CTRL + Print", shot_window)
 exec("ALT + Print", shot_screen)
+-- Annotate: select an area, draw on it in swappy, then copy (Ctrl+C) or save (Ctrl+S)
+exec(mainMod .. " + Print", shot_annotate)
+exec(mainMod .. " + SHIFT + S", shot_annotate)
 
 -- Grouping
 bind(mainMod .. " + W", hl.dsp.group.toggle()) -- was SUPER+K (now vim focus)

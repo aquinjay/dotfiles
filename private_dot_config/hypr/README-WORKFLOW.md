@@ -588,6 +588,8 @@ SUPER + F              fullscreen
 SUPER + V              float/tile
 SUPER + Y              pin/unpin floating window
 SUPER + Escape         lock
+Print                  screenshot area (copy + save)
+SUPER + Shift + S      screenshot area + annotate
 SUPER + h/j/k/l        focus left/down/up/right
 SUPER + Shift + h/j/k/l  move window left/down/up/right
 SUPER + T              toggle split direction
@@ -635,6 +637,22 @@ Pinned floating window → tool you need everywhere
 The goal is not to use every feature.
 
 The goal is to make window movement cheap enough that your desktop stops getting in the way.
+
+---
+
+## Screenshots
+
+Plain screenshots are copied to the clipboard **and** saved to `~/Pictures/Screenshots/`.
+
+| Keybind | Action |
+|---|---|
+| `Print` | Select an area |
+| `Ctrl + Print` | Active window |
+| `Alt + Print` | Whole screen |
+| `SUPER + Shift + S` or `SUPER + Print` | Select an area, then annotate in swappy |
+
+In swappy: draw with arrows / boxes / text / blur, then `Ctrl + C` to copy or `Ctrl + S` to save
+(saved as `annotated_*.png`). Settings live in `~/.config/swappy/config`.
 
 ---
 
