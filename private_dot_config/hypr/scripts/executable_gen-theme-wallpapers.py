@@ -3,7 +3,8 @@
 
 Writes SVGs and renders them to PNG with rsvg-convert, into ~/Pictures/Wallpapers/themes/:
     deus-ex.png        black faceted geometry, gold edges
-    samurai.png        hi-tech samurai mask in red neon, circuits and HUD (black / red / chrome)
+    samurai.png        red circuits, HUD and katakana on black; puts your Samurai logo in the middle
+                       if themes/samurai-logo.png (or .jpg/.webp/.svg) exists
     fallout.png        green CRT terminal showing live system info and a keybind reference
     fallout-plain.png  the same CRT screen with no text
 
@@ -12,6 +13,7 @@ Usage: gen-theme-wallpapers.py [NAME ...] [--size WIDTHxHEIGHT]
     focused monitor's resolution. Fixed seeds, so the art is the same every run;
     fallout.png picks up fresh system info each time (theme.sh re-runs it on apply).
 """
+import base64
 import getpass
 import json
 import math
@@ -116,49 +118,25 @@ def deus_ex():
 
 
 def samurai():
-    """Hi-tech samurai: an angular kabuto + menpo mask outlined in red neon, circuit traces, HUD, glitch."""
+    """Hi-tech samurai background: circuit traces, HUD, katakana and glitch slices around a central emblem.
+
+    The emblem is your own image: drop the Samurai logo at themes/samurai-logo.{png,jpg,webp,svg}.
+    Without it the centre is left empty."""
     rnd = random.Random(2023)
     RED, DEEP, CHROME, STEEL = "#ff1f3d", "#8a0f1f", "#d6dbe4", "#5d6b7e"
     cx, cy, sc = W * 0.66, H * 0.53, H / 1080
 
-    def T(points):                                   # local mask coords -> screen
-        return [(cx + x * sc, cy + y * sc) for x, y in points]
-
-    def sym(right):                                  # right half -> full symmetric outline
-        return right + [(-x, y) for x, y in reversed(right)]
-
-    def mirror(points):
-        return [(-x, y) for x, y in points]
-
-    blade = [(10, -165), (60, -232), (150, -335), (275, -440), (205, -322), (112, -222), (40, -160)]
-    bowl = sym([(0, -168), (70, -162), (135, -136), (182, -94), (204, -42), (210, -8)])
-    brim = [(-236, -12), (236, -12), (256, 22), (-256, 22)]
-    flap = [(208, -36), (305, -78), (338, 6), (254, 62), (218, 22)]
-    menpo = sym([(0, 32), (82, 34), (152, 52), (178, 98), (168, 152), (132, 208), (82, 248), (30, 266)])
-    eye = [(30, 92), (70, 74), (156, 58), (146, 84), (62, 102)]
-    mouth = [(-96, 196), (96, 196), (80, 236), (-80, 236)]
-    gem = [(0, -238), (28, -192), (0, -150), (-28, -192)]
-
-    solids, lines = [], []
-    for poly in (bowl, menpo):
-        solids.append(f'<polygon points="{pts(T(poly))}"/>')
-    for poly in (blade, mirror(blade), flap, mirror(flap), brim, gem, mouth):
-        solids.append(f'<polygon points="{pts(T(poly))}"/>')
-    for i in range(4):                               # shikoro: lamellar neck guard
-        band = [(214 + i * 10, 40 + i * 38), (330 + i * 20, 30 + i * 46), (342 + i * 20, 62 + i * 46), (219 + i * 10, 72 + i * 38)]
-        solids.append(f'<polygon points="{pts(T(band))}"/>')
-        solids.append(f'<polygon points="{pts(T(mirror(band)))}"/>')
-    for x in range(-60, 61, 20):                     # mouth guard teeth
-        lines.append(T([(x, 200), (x * 0.86, 232)]))
-    lines += [T([(0, 104), (0, 172)]), T([(0, 172), (26, 184)]), T([(0, 172), (-26, 184)])]
-    for side in (1, -1):                             # tech lines on the cheeks and helmet
-        lines.append(T([(side * 150, 112), (side * 112, 132), (side * 112, 176), (side * 92, 190)]))
-        lines.append(T([(side * 60, -140), (side * 120, -112), (side * 150, -70)]))
-        lines.append(T([(side * 20, -60), (side * 90, -60), (side * 120, -30)]))
-    for k in range(3):
-        lines.append(T([(-34, 248 + k * 6), (34, 248 + k * 6)]))
-    line_svg = "".join(f'<polyline points="{pts(l)}" fill="none"/>' for l in lines)
-    eyes = "".join(f'<polygon points="{pts(T(p))}"/>' for p in (eye, mirror(eye)))
+    emblem, emblem_glow = "", ""
+    logo = next((os.path.join(OUT, "samurai-logo." + ext) for ext in ("png", "jpg", "jpeg", "webp", "svg")
+                 if os.path.exists(os.path.join(OUT, "samurai-logo." + ext))), None)
+    if logo:
+        mime = {"svg": "image/svg+xml", "jpg": "image/jpeg", "jpeg": "image/jpeg"}.get(logo.rsplit(".", 1)[1], "image/" + logo.rsplit(".", 1)[1])
+        with open(logo, "rb") as f:
+            data = base64.b64encode(f.read()).decode()
+        bw, bh = W * 0.42, H * 0.66                  # box the logo is fitted into
+        emblem = (f'<image href="data:{mime};base64,{data}" x="{cx - bw / 2:.0f}" y="{cy - 40 * sc - bh / 2:.0f}" '
+                  f'width="{bw:.0f}" height="{bh:.0f}" preserveAspectRatio="xMidYMid meet"/>')
+        emblem_glow = '<use href="#mask" filter="url(#redglow)" opacity="0.75"/>'
 
     # circuit traces running out from the mask
     traces, pads = [], []
@@ -197,8 +175,9 @@ def samurai():
     hud = f"""
 <g font-family="{mono}" font-size="{15 * sc:.0f}" fill="{CHROME}" opacity="0.55">
   <text x="{m + 20 * sc:.0f}" y="{m + 34 * sc:.0f}">侍 // SAMURAI.SYS  ONLINE</text>
-  <text x="{m + 20 * sc:.0f}" y="{m + 56 * sc:.0f}" fill="{STEEL}">NEURAL LINK ........ STABLE</text>
-  <text x="{m + 20 * sc:.0f}" y="{m + 78 * sc:.0f}" fill="{STEEL}">CYBERWARE .......... 87%</text>
+  <text x="{m + 20 * sc:.0f}" y="{m + 56 * sc:.0f}" fill="{RED}">NEURAL LINK ........ UNSTABLE</text>
+  <text x="{m + 20 * sc:.0f}" y="{m + 78 * sc:.0f}" fill="{STEEL}">RELIC INTEGRITY .... 13%</text>
+  <text x="{m + 20 * sc:.0f}" y="{m + 100 * sc:.0f}" fill="{STEEL}">CYBERPSYCHOSIS ..... ELEVATED</text>
   <text x="{W - m - 20 * sc:.0f}" y="{H - m - 22 * sc:.0f}" text-anchor="end">35.6762 N  139.6503 E</text>
   <text x="{W - m - 20 * sc:.0f}" y="{H - m - 44 * sc:.0f}" text-anchor="end" fill="{RED}">// WAKE UP. WE HAVE A CITY TO BURN</text>
 </g>"""
@@ -211,13 +190,12 @@ def samurai():
     <stop offset="0" stop-color="#17171c"/><stop offset="1" stop-color="#09090b"/>
   </linearGradient>
   <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="{5 * sc:.1f}"/></filter>
-  <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="{1.6 * sc:.1f}"/></filter>
+  <filter id="redglow" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="{14 * sc:.1f}"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 0.12  0 0 0 0 0.24  0 0 0 0.9 0"/>
+  </filter>
   {''.join(glitch_defs)}
-  <g id="mask">
-    <g fill="url(#armor)" stroke="{RED}" stroke-width="{2.6 * sc:.1f}" stroke-linejoin="miter">{''.join(solids)}</g>
-    <g stroke="{RED}" stroke-width="{1.6 * sc:.1f}" opacity="0.8">{line_svg}</g>
-    <g fill="#ff3b55">{eyes}</g>
-    <g fill="#fff4f5" filter="url(#soft)" opacity="0.8">{eyes}</g>
+  <g id="mask">{emblem}
   </g>
   {vignette(0.8)}
   {scanlines(0.3)}
@@ -228,9 +206,7 @@ def samurai():
 <g fill="{RED}">{''.join(pads)}</g>
 <text x="{W * 0.1:.0f}" y="{H * 0.18:.0f}" font-family="Noto Sans CJK JP" font-weight="900" font-size="{150 * sc:.0f}"
       fill="{RED}" opacity="0.16" writing-mode="tb">サムライ</text>
-<g stroke="{RED}" stroke-width="{6 * sc:.1f}" filter="url(#glow)" opacity="0.55" fill="none">
-  <use href="#mask"/>
-</g>
+{emblem_glow}
 <use href="#mask"/>
 {''.join(glitch_use)}
 <g stroke="{CHROME}" stroke-width="{1.5 * sc:.1f}" opacity="0.5">{brackets}</g>
@@ -280,7 +256,7 @@ KEYS = [
 
 def fallout(with_text=True):
     """Green phosphor CRT. With text: live system info and a keybind reference, terminal style."""
-    green, dim, faint = "#1aff80", "#12a356", "#0b5c31"
+    green, dim, faint = "#1aff80", "#3fd884", "#1f7a45"
     sc = H / 1080
     fs, lh = 25 * sc, 38 * sc
     cw = fs * 0.6                                    # monospace cell width
@@ -314,10 +290,10 @@ def fallout(with_text=True):
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}">
 <defs>
   <radialGradient id="screen" cx="0.5" cy="0.48" r="0.8">
-    <stop offset="0" stop-color="#06301a"/><stop offset="0.6" stop-color="#03170b"/><stop offset="1" stop-color="#010603"/>
+    <stop offset="0" stop-color="#0f4d2a"/><stop offset="0.6" stop-color="#0a321b"/><stop offset="1" stop-color="#04170b"/>
   </radialGradient>
   <filter id="glow" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="{3.5 * sc:.1f}"/></filter>
-  {vignette(0.95)}
+  {vignette(0.75)}
   {scanlines(0.45, 3)}
 </defs>
 <rect width="100%" height="100%" fill="url(#screen)"/>

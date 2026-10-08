@@ -697,8 +697,10 @@ Config: `~/.config/swaync/config.json`.
 - **Wallpaper colors**: soft, rounded look; colors come from the wallpaper. Choosing it from the
   menu restores the last wallpaper you used in this mode (default: CachyOS Skyscraper).
 - **Deus Ex**: faceted black geometry with gold edges, sharp corners, subtle gold glow.
-- **Samurai**: Cyberpunk-2077-style hi-tech samurai: red neon mask, circuit traces and HUD on black;
-  red and chrome UI, sharp corners.
+- **Samurai**: Cyberpunk-2077-style: red circuit traces, HUD and katakana on black; red and chrome UI,
+  sharp corners. To put the Samurai logo in the middle, save it as
+  `~/Pictures/Wallpapers/themes/samurai-logo.png` (transparent PNG works best; .jpg/.webp/.svg also
+  work), run `scripts/gen-theme-wallpapers.py samurai`, then re-apply the theme.
 - **Fallout Terminal**: green phosphor monochrome with a CRT screen shader (scanlines + vignette).
   The wallpaper is a terminal showing your system info and a keybind reference, refreshed each time
   the theme is applied. For a text-free screen, set `"wallpaper"` in `presets/fallout.json` to
