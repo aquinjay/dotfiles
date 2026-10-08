@@ -3,7 +3,7 @@
 
 
 * {
-    font-family: "FantasqueSansM Nerd Font", "Fira Sans Semibold", "Font Awesome 6 Free", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+    /* font-family is set per theme in colors.css */
     font-size: 14px;  /* Slightly smaller font size */
     font-weight: 900;
     margin: 0;
@@ -37,7 +37,6 @@ window#waybar.hidden {
 #workspaces button {
     padding: 3px 5px;  /* Adjusted padding to reduce height */
     margin: 3px 5px;    /* Reduced margin slightly */
-    border-radius: 6px;
     color: @foreground;
     background-color: alpha(@surface_container, 0.85);
     transition: all 0.3s ease-in-out;
@@ -59,7 +58,6 @@ window#waybar.hidden {
 
 #workspaces {
     background-color: alpha(@surface_container, 0.85);
-    border-radius: 14px;
     padding: 3px 6px;  /* Adjusted padding to reduce height */
 }
 
@@ -68,7 +66,6 @@ window#waybar.hidden {
     font-size: 15px;   /* Slightly smaller font size */
     font-weight: 800;
     color: @foreground;
-    border-radius: 14px;
     padding: 3px 6px;  /* Reduced padding */
     margin: 2px;
     opacity: 1;
@@ -105,25 +102,21 @@ window#waybar.hidden {
 #custom-weather.snowyIcyNight,
 #custom-weather.default {
     background-color: alpha(@surface_container, 0.85);
-    border-radius: 14px;
     padding: 6px;  /* Adjusted padding */
 }
 
 #custom-screenshot_t {
     background-color: alpha(@surface_container, 0.85);
-    border-radius: 14px;
     padding: 6px;
 }
 
 #custom-spotify {
     background-color: alpha(@surface_container, 0.85);
-    border-radius: 14px;
     padding: 3px 12px;
 }
 
 #tray {
     background-color: alpha(@surface_container, 0.85);
-    border-radius: 14px;
     padding: 6px;  /* Adjusted padding */
 }
 
@@ -141,13 +134,11 @@ window#waybar.hidden {
 
 #custom-power {
     background-color: alpha(@surface_container, 0.85);
-    border-radius: 14px;
     padding: 6px;
 }
 
 #custom-storage {
     background-color: alpha(@surface_container, 0.85);
-    border-radius: 14px;
     padding: 6px;
 }
 

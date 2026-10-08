@@ -81,7 +81,7 @@ hl.config({
   general = {
     gaps_in = 3,
     gaps_out = 5,
-    border_size = 3,
+    border_size = theme.border_size or 3,
     col = {
       active_border = { colors = { theme.primary, theme.tertiary }, angle = 45 },
       inactive_border = theme.outline_variant,
@@ -95,7 +95,7 @@ hl.config({
   decoration = {
     active_opacity = 1,
     inactive_opacity = 0.95,
-    rounding = 8,
+    rounding = theme.rounding or 8,
     blur = {
       size = 15,
       passes = 2,
@@ -103,9 +103,17 @@ hl.config({
     },
     shadow = {
       enabled = true,
-      range = 14,
+      range = theme.shadow_range or 14,
       render_power = 3,
       color = theme.shadow,
+    },
+    -- Neon glow around the focused window (presets only; empty glow = off)
+    glow = {
+      enabled = (theme.glow or "") ~= "",
+      range = 12,
+      render_power = 3,
+      color = (theme.glow ~= "" and theme.glow) or "rgba(00000000)",
+      color_inactive = "rgba(00000000)",
     },
   },
 
@@ -233,6 +241,7 @@ exec(mainMod .. " + SHIFT + M", [[loginctl terminate-user ""]])
 bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 exec(mainMod .. " + SPACE", applauncher)
 exec(mainMod .. " + SHIFT + W", [[~/.config/hypr/scripts/wallpaper.sh]]) -- pick wallpaper, re-theme everything
+exec(mainMod .. " + SHIFT + T", [[~/.config/hypr/scripts/theme.sh]]) -- theme menu: wallpaper colors / Deus Ex / Cyberpunk
 exec("ALT + Tab", [[rofi -show window]])
 exec(mainMod .. " + SHIFT + SPACE", [[rofi -show emoji]]) -- picked emoji is copied; paste with Ctrl+V
 bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))

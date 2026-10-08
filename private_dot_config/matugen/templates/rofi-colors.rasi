@@ -8,4 +8,7 @@
     accent-lt: {{colors.tertiary.default.hex}};
     on-accent: {{colors.on_primary.default.hex}};
     urgent:    {{colors.error.default.hex}};
+    radius:    {{style.radius}}px;
+    radius-lg: {{style.radius_lg}}px;
+    font:      "{{style.font}} 13";
 }

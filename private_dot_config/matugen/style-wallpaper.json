@@ -1,0 +1,6 @@
+{
+  "rounding": 8, "border_size": 3, "radius": 8, "radius_lg": 14,
+  "font": "FantasqueSansM Nerd Font", "font_fallback": "FantasqueSansM Nerd Font",
+  "glow": "", "shadow_range": 14,
+  "module_border": "none"
+}

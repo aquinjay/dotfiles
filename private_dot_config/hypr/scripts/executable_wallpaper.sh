@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 # Pick a wallpaper (thumbnail grid in rofi), or pass an image path as $1.
-# Sets it, then has matugen re-theme Hyprland, waybar, rofi, swaync, hyprlock and alacritty.
+# Sets it, then has matugen re-theme everything from it (see theme.sh).
 # Bound to SUPER + SHIFT + W. Add your own wallpapers to ~/Pictures/Wallpapers.
 set -euo pipefail
 
 dirs=("$HOME/Pictures/Wallpapers" "/usr/share/wallpapers/cachyos-wallpapers")
-link="$HOME/.config/hypr/wallpaper"
 
 if [[ $# -ge 1 ]]; then
   img=$(realpath "$1")
@@ -26,17 +25,5 @@ else
   img=${files[$choice]}
 fi
 
-[[ -f $img ]] || { notify-send "Wallpaper" "Not a file: $img"; exit 1; }
-
-ln -sfn "$img" "$link"
-
-# Start the new wallpaper before stopping the old one, to avoid a flash.
-old=$(pgrep -x swaybg || true)
-setsid swaybg -o '*' -i "$link" -m fill >/dev/null 2>&1 &
-sleep 0.4
-[[ -n $old ]] && kill $old 2>/dev/null || true
-
-# Generate colors; matugen's post-hooks reload Hyprland, waybar and swaync.
-matugen image "$img" --prefer saturation -q
-
-notify-send -i "$img" "Theme updated" "$(basename "$img")"
+# Set it and re-theme everything from it (switches to wallpaper-colors mode).
+exec "$HOME/.config/hypr/scripts/theme.sh" wallpaper "$img"

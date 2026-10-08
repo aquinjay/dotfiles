@@ -13,8 +13,9 @@
   --text-color: {{colors.on_surface.default.hex}};
   --text-color-disabled: {{colors.on_surface_variant.default.hex}};
   --bg-selected: {{colors.primary.default.hex}};
+  --border-radius: {{style.radius_lg}}px;
 }
 
 * {
-  font-family: "FantasqueSansM Nerd Font", sans-serif;
+  font-family: "{{style.font}}", sans-serif;
 }

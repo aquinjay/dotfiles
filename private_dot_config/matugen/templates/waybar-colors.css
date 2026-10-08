@@ -11,3 +11,20 @@
 @define-color on_surface_variant {{colors.on_surface_variant.default.hex}};
 @define-color outline {{colors.outline.default.hex}};
 @define-color foreground {{colors.on_surface.default.hex}};
+
+/* Font and shape come from the theme style, so presets can be angular. */
+* {
+    font-family: "{{style.font}}", "FantasqueSansM Nerd Font", "Font Awesome 6 Free", sans-serif;
+}
+
+#workspaces, #window, #clock, #battery, #cpu, #memory, #disk, #temperature, #backlight,
+#network, #pulseaudio, #wireplumber, #custom-media, #mode, #idle_inhibitor, #mpd,
+#bluetooth, #custom-spotify, #custom-weather, #custom-screenshot_t, #tray,
+#custom-power, #custom-storage, #custom-notification {
+    border-radius: {{style.radius_lg}}px;
+    border: {{style.module_border}};
+}
+
+#workspaces button {
+    border-radius: {{style.radius}}px;
+}
