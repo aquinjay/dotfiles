@@ -42,7 +42,7 @@ These are the keybinds to learn first.
 | `SUPER + F` | Toggle fullscreen | Focus on one app |
 | `SUPER + V` | Toggle floating | Free-position a window |
 | `SUPER + Y` | Pin active floating window | Make a floating window follow all workspaces |
-| `SUPER + L` | Lock screen (hyprlock) | Step away safely |
+| `SUPER + Escape` | Lock screen (hyprlock) | Step away safely |
 | `SUPER + B` | Show/hide the top bar | Check time, battery, etc. |
 | `SUPER + E` | File manager (thunar) | Browse files |
 | `SUPER + Shift + E` | Terminal file manager (yazi) | Fast keyboard file browsing |
@@ -392,10 +392,24 @@ Good for:
 
 ---
 
+## Vim-Style Focus
+
+| Keybind | Action |
+|---|---|
+| `SUPER + h / j / k / l` | Focus window left / down / up / right |
+| `SUPER + Shift + h / j / k / l` | Move window left / down / up / right |
+
+Arrow keys still work for both. Resize stays on `SUPER + Ctrl + Shift + h/j/k/l`.
+
+Keys moved to make room: lock is now `SUPER + Escape` (was `L`), split toggle is `SUPER + T`
+(was `J`), and window grouping is `SUPER + W` (was `K`).
+
+---
+
 ## Split Direction
 
 ```text
-SUPER + J
+SUPER + T
 ```
 
 This toggles the split direction for the next tiled window.
@@ -405,7 +419,7 @@ Use it when Hyprland places windows in a way that does not match what you want.
 Simple mental model:
 
 ```text
-SUPER + J → change how the next split behaves
+SUPER + T → change how the next split behaves
 ```
 
 ---
@@ -573,7 +587,11 @@ SUPER + Q              close window
 SUPER + F              fullscreen
 SUPER + V              float/tile
 SUPER + Y              pin/unpin floating window
-SUPER + L              lock
+SUPER + Escape         lock
+SUPER + h/j/k/l        focus left/down/up/right
+SUPER + Shift + h/j/k/l  move window left/down/up/right
+SUPER + T              toggle split direction
+SUPER + W              toggle window group
 SUPER + B              show/hide bar
 SUPER + E              thunar
 SUPER + Shift + E      yazi

@@ -50,6 +50,10 @@ hl.on("hyprland.start", function()
   hl.exec_cmd([[bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &]])
   hl.exec_cmd([[/usr/lib/polkit-kde-authentication-agent-1 &]])
 
+  -- Clipboard history (cliphist): record text and images
+  hl.exec_cmd([[wl-paste --type text --watch cliphist store]])
+  hl.exec_cmd([[wl-paste --type image --watch cliphist store]])
+
   -- Slow app launch fix
   hl.exec_cmd([[systemctl --user import-environment &]])
   hl.exec_cmd([[hash dbus-update-activation-environment 2>/dev/null &]])
@@ -210,7 +214,11 @@ bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 exec(mainMod .. " + SPACE", applauncher)
 bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 bind(mainMod .. " + Y", hl.dsp.window.pin())
-bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
+bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- was SUPER+J (now vim focus)
+
+-- Clipboard history: pick an entry to copy it again, or delete one
+exec(mainMod .. " + SHIFT + V", [[cliphist list | wofi --dmenu --prompt "clipboard" | cliphist decode | wl-copy]])
+exec(mainMod .. " + ALT + V", [[cliphist list | wofi --dmenu --prompt "delete from history" | cliphist delete]])
 
 -- Screenshots
 exec("Print", shot_region)
@@ -218,7 +226,7 @@ exec("CTRL + Print", shot_window)
 exec("ALT + Print", shot_screen)
 
 -- Grouping
-bind(mainMod .. " + K", hl.dsp.group.toggle())
+bind(mainMod .. " + W", hl.dsp.group.toggle()) -- was SUPER+K (now vim focus)
 bind(mainMod .. " + Tab", hl.dsp.group.next())
 
 -- Toggle gaps
@@ -238,7 +246,7 @@ exec("XF86AudioPrev", [[playerctl previous]])
 -- Screen brightness / lock / waybar
 exec("XF86MonBrightnessUp", [[brightnessctl s +5%]], { locked = true, repeating = true })
 exec("XF86MonBrightnessDown", [[brightnessctl s 5%-]], { locked = true, repeating = true })
-exec(mainMod .. " + L", [[loginctl lock-session]]) -- hypridle runs hyprlock
+exec(mainMod .. " + escape", [[loginctl lock-session]]) -- hypridle runs hyprlock; was SUPER+L (now vim focus)
 exec(mainMod .. " + O", [[killall -SIGUSR2 waybar]])
 exec(mainMod .. " + B", [[killall -SIGUSR1 waybar]])
 
@@ -252,6 +260,15 @@ move_focus(mainMod .. " + left", "l")
 move_focus(mainMod .. " + right", "r")
 move_focus(mainMod .. " + up", "u")
 move_focus(mainMod .. " + down", "d")
+-- Vim-style: SUPER + h/j/k/l moves focus, SUPER + SHIFT + h/j/k/l moves the window
+move_focus(mainMod .. " + h", "l")
+move_focus(mainMod .. " + j", "d")
+move_focus(mainMod .. " + k", "u")
+move_focus(mainMod .. " + l", "r")
+move_window(mainMod .. " + SHIFT + h", "l")
+move_window(mainMod .. " + SHIFT + j", "d")
+move_window(mainMod .. " + SHIFT + k", "u")
+move_window(mainMod .. " + SHIFT + l", "r")
 
 -- Resize submap
 bind(mainMod .. " + R", hl.dsp.submap("resize"))
