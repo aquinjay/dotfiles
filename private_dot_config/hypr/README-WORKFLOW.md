@@ -42,7 +42,10 @@ These are the keybinds to learn first.
 | `SUPER + F` | Toggle fullscreen | Focus on one app |
 | `SUPER + V` | Toggle floating | Free-position a window |
 | `SUPER + Y` | Pin active floating window | Make a floating window follow all workspaces |
-| `SUPER + L` | Lock screen | Step away safely |
+| `SUPER + L` | Lock screen (hyprlock) | Step away safely |
+| `SUPER + B` | Show/hide the top bar | Check time, battery, etc. |
+| `SUPER + E` | File manager (thunar) | Browse files |
+| `SUPER + Shift + E` | Terminal file manager (yazi) | Fast keyboard file browsing |
 
 ---
 
@@ -414,19 +417,10 @@ Your config includes gestures.
 | Gesture | Action |
 |---|---|
 | 4-finger horizontal swipe | Switch workspace |
-| 3-finger down | Close active window |
 | 3-finger up | Fullscreen |
 | 3-finger left | Toggle floating |
 
-Be careful with:
-
-```text
-3-finger down
-```
-
-because it closes the active window.
-
-If accidental closes happen, this should be one of the first things to change.
+The old 3-finger-down "close window" gesture was removed because it was too easy to trigger by accident.
 
 ---
 
@@ -580,6 +574,9 @@ SUPER + F              fullscreen
 SUPER + V              float/tile
 SUPER + Y              pin/unpin floating window
 SUPER + L              lock
+SUPER + B              show/hide bar
+SUPER + E              thunar
+SUPER + Shift + E      yazi
 
 SUPER + 1-9/0          switch workspace
 SUPER + Shift + 1-9/0  move window silently
@@ -620,3 +617,19 @@ Pinned floating window → tool you need everywhere
 The goal is not to use every feature.
 
 The goal is to make window movement cheap enough that your desktop stops getting in the way.
+
+---
+
+## Idle and Lock
+
+Handled by `hypridle` (settings in `hypridle.conf`, lock screen in `hyprlock.conf`):
+
+| Idle time | What happens |
+|---|---|
+| 4 min | Screen dims |
+| 5 min | Locks |
+| 5.5 min | Screen turns off |
+| Lid close / sleep | Locks first |
+
+This config is Lua (`hyprland.lua`), so `hyprctl dispatch` commands use Lua syntax, e.g.
+`hyprctl dispatch 'hl.dsp.dpms({ action = "off" })'` — not the `dispatch dpms off` form most guides show.
