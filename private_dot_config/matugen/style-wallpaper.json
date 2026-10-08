@@ -8,5 +8,6 @@
   "glow": "",
   "shadow_range": 14,
   "module_border": "none",
-  "screen_shader": ""
+  "screen_shader": "",
+  "terminal": "alacritty"
 }

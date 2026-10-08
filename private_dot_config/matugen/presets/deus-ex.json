@@ -11,7 +11,8 @@
     "glow": "rgba(f2a90038)",
     "shadow_range": 22,
     "module_border": "1px solid alpha(@primary, 0.35)",
-    "screen_shader": ""
+    "screen_shader": "",
+    "terminal": "alacritty"
   },
   "colors": {
     "primary": "#f2a900",

@@ -231,7 +231,7 @@ local function resize_window(keys, x, y)
 end
 
 -- Keybinds: apps / session
-exec(mainMod .. " + RETURN", terminal)
+exec(mainMod .. " + RETURN", theme.terminal or terminal) -- per theme: Fallout uses cool-retro-term
 if filemanager ~= "" then
   exec(mainMod .. " + E", filemanager)
   exec(mainMod .. " + SHIFT + E", terminal .. " -e yazi")

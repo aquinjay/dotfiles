@@ -701,9 +701,13 @@ Config: `~/.config/swaync/config.json`.
   sharp corners. To put the Samurai logo in the middle, save it as
   `~/Pictures/Wallpapers/themes/samurai-logo.png` (transparent PNG works best; .jpg/.webp/.svg also
   work), run `scripts/gen-theme-wallpapers.py samurai`, then re-apply the theme.
+  A logo on a solid black background needs its black made transparent first, with the inside
+  filled back in (that is how the current logo was prepared from the example image).
 - **Fallout Terminal**: green phosphor monochrome with a CRT screen shader (scanlines + vignette).
   The wallpaper is a terminal showing your system info and a keybind reference, refreshed each time
-  the theme is applied. For a text-free screen, set `"wallpaper"` in `presets/fallout.json` to
+  the theme is applied. In this theme `SUPER + Enter` opens **cool-retro-term** (curved green CRT;
+  its profile is "Fallout Terminal" under right-click > Settings); other themes use alacritty.
+  For a text-free screen, set `"wallpaper"` in `presets/fallout.json` to
   `~/Pictures/Wallpapers/themes/fallout-plain.png` and remove `"wallpaper_cmd"`.
   The shader lives in `~/.config/hypr/shaders/crt.glsl`; other themes switch it off.
 

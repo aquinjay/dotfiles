@@ -11,7 +11,8 @@
     "glow": "rgba(1aff8055)",
     "shadow_range": 18,
     "screen_shader": "~/.config/hypr/shaders/crt.glsl",
-    "module_border": "1px solid alpha(@primary, 0.45)"
+    "module_border": "1px solid alpha(@primary, 0.45)",
+    "terminal": "cool-retro-term"
   },
   "colors": {
     "primary": "#1aff80",

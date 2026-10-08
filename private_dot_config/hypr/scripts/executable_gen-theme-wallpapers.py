@@ -136,7 +136,7 @@ def samurai():
         bw, bh = W * 0.42, H * 0.66                  # box the logo is fitted into
         emblem = (f'<image href="data:{mime};base64,{data}" x="{cx - bw / 2:.0f}" y="{cy - 40 * sc - bh / 2:.0f}" '
                   f'width="{bw:.0f}" height="{bh:.0f}" preserveAspectRatio="xMidYMid meet"/>')
-        emblem_glow = '<use href="#mask" filter="url(#redglow)" opacity="0.75"/>'
+        emblem_glow = '<use href="#mask" filter="url(#redglow)" opacity="0.55"/>'
 
     # circuit traces running out from the mask
     traces, pads = [], []
@@ -159,10 +159,10 @@ def samurai():
 
     # glitch: horizontal slices of the mask shifted sideways
     glitch_defs, glitch_use = [], []
-    for i in range(6):
+    for i in range(4):
         y0 = cy + rnd.uniform(-420, 260) * sc
-        hgt = rnd.uniform(4, 18) * sc
-        dx = rnd.choice([-1, 1]) * rnd.uniform(12, 46) * sc
+        hgt = rnd.uniform(3, 10) * sc
+        dx = rnd.choice([-1, 1]) * rnd.uniform(6, 22) * sc
         glitch_defs.append(f'<clipPath id="g{i}"><rect x="0" y="{y0:.0f}" width="{W}" height="{hgt:.0f}"/></clipPath>')
         glitch_use.append(f'<use href="#mask" clip-path="url(#g{i})" transform="translate({dx:.0f} 0)" opacity="0.85"/>')
 

@@ -16,4 +16,5 @@ return {
   border_size     = {{style.border_size}},
   shadow_range    = {{style.shadow_range}},
   screen_shader   = "{{style.screen_shader}}",
+  terminal        = "{{style.terminal}}",
 }
