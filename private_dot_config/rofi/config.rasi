@@ -1,0 +1,20 @@
+/* rofi launcher. Switch modes with Ctrl+Tab (or Shift+Left/Right). */
+configuration {
+    modes:               "drun,window,run,filebrowser,emoji";
+    show-icons:          true;
+    icon-theme:          "Adwaita";
+    terminal:            "alacritty";
+    font:                "FantasqueSansM Nerd Font 13";
+    drun-display-format: "{name}";
+    display-drun:        " apps";
+    display-window:      " windows";
+    display-run:         " run";
+    display-filebrowser: " files";
+    display-emoji:       "󰞅 emoji";
+    window-format:       "{w}  {c}  {t}";
+    matching:            "fuzzy";
+    sort:                true;
+    sorting-method:      "fzf";
+}
+
+@theme "~/.config/rofi/cachy.rasi"

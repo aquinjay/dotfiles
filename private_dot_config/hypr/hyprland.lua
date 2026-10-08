@@ -6,7 +6,7 @@ local mainMod = "SUPER"
 
 -- Programs / defaults
 local filemanager = "thunar"
-local applauncher = "wofi"
+local applauncher = "rofi -show drun" -- settings in ~/.config/rofi/
 local terminal = "alacritty"
 local idlehandler = "hypridle" -- settings in ~/.config/hypr/hypridle.conf
 
@@ -46,7 +46,7 @@ hl.on("hyprland.start", function()
   hl.exec_cmd([[swaybg -o \* -i /usr/share/wallpapers/cachyos-wallpapers/Skyscraper.png -m fill]])
   hl.exec_cmd([[waybar &]])
   hl.exec_cmd([[fcitx5 -d &]])
-  hl.exec_cmd([[mako &]])
+  hl.exec_cmd([[swaync]]) -- notifications; settings in ~/.config/swaync/
   hl.exec_cmd([[nm-applet --indicator &]])
   hl.exec_cmd([[bash -c "mkfifo /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob && tail -f /tmp/$HYPRLAND_INSTANCE_SIGNATURE.wob | wob & disown" &]])
   hl.exec_cmd([[/usr/lib/polkit-kde-authentication-agent-1 &]])
@@ -213,13 +213,19 @@ bind(mainMod .. " + Q", hl.dsp.window.close())
 exec(mainMod .. " + SHIFT + M", [[loginctl terminate-user ""]])
 bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 exec(mainMod .. " + SPACE", applauncher)
+exec("ALT + Tab", [[rofi -show window]])
+exec(mainMod .. " + SHIFT + SPACE", [[rofi -show emoji]]) -- picked emoji is copied; paste with Ctrl+V
 bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 bind(mainMod .. " + Y", hl.dsp.window.pin())
 bind(mainMod .. " + T", hl.dsp.layout("togglesplit")) -- was SUPER+J (now vim focus)
 
+-- Notifications (swaync): open the panel, or toggle do-not-disturb
+exec(mainMod .. " + N", [[swaync-client -t -sw]])
+exec(mainMod .. " + SHIFT + N", [[swaync-client -d -sw]])
+
 -- Clipboard history: pick an entry to copy it again, or delete one
-exec(mainMod .. " + SHIFT + V", [[cliphist list | wofi --dmenu --prompt "clipboard" | cliphist decode | wl-copy]])
-exec(mainMod .. " + ALT + V", [[cliphist list | wofi --dmenu --prompt "delete from history" | cliphist delete]])
+exec(mainMod .. " + SHIFT + V", [[cliphist list | rofi -dmenu -display-columns 2 -p "󰅌 clipboard" | cliphist decode | wl-copy]])
+exec(mainMod .. " + ALT + V", [[cliphist list | rofi -dmenu -display-columns 2 -p "󰆴 delete" | cliphist delete]])
 
 -- Screenshots
 exec("Print", shot_region)

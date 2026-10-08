@@ -37,7 +37,10 @@ These are the keybinds to learn first.
 | Keybind | Action | Use Case |
 |---|---|---|
 | `SUPER + Enter` | Open terminal | Start almost anything |
-| `SUPER + Space` | Open app launcher | Launch apps by name |
+| `SUPER + Space` | Open app launcher (rofi) | Launch apps by name |
+| `ALT + Tab` | Window switcher | Jump to any open window by name |
+| `SUPER + Shift + V` | Clipboard history | Re-copy something from earlier |
+| `SUPER + N` | Notification panel | See missed notifications |
 | `SUPER + Q` | Close active window | Quit/remove current window |
 | `SUPER + F` | Toggle fullscreen | Focus on one app |
 | `SUPER + V` | Toggle floating | Free-position a window |
@@ -582,7 +585,13 @@ Do not try to memorize everything at once.
 
 ```text
 SUPER + Enter          terminal
-SUPER + Space          launcher
+SUPER + Space          launcher (rofi)
+ALT + Tab              window switcher
+SUPER + Shift + Space  emoji picker (copies)
+SUPER + Shift + V      clipboard history
+SUPER + Alt + V        delete from clipboard history
+SUPER + N              notification panel
+SUPER + Shift + N      do not disturb
 SUPER + Q              close window
 SUPER + F              fullscreen
 SUPER + V              float/tile
@@ -637,6 +646,42 @@ Pinned floating window → tool you need everywhere
 The goal is not to use every feature.
 
 The goal is to make window movement cheap enough that your desktop stops getting in the way.
+
+---
+
+## Launcher (rofi)
+
+| Keybind | Opens |
+|---|---|
+| `SUPER + Space` | Apps |
+| `ALT + Tab` | Open windows |
+| `SUPER + Shift + Space` | Emoji (picked emoji is copied; paste with `Ctrl + V`) |
+
+Inside rofi, `Ctrl + Tab` (or `Shift + Left/Right`) cycles modes: apps, windows, run, files, emoji.
+Typing is fuzzy, so `fx` finds Firefox. Config: `~/.config/rofi/config.rasi`, colors: `~/.config/rofi/cachy.rasi`.
+
+---
+
+## Clipboard History (cliphist)
+
+Everything you copy (text and images) is remembered.
+
+| Keybind | Action |
+|---|---|
+| `SUPER + Shift + V` | Pick an old entry; it is copied again, then paste with `Ctrl + V` |
+| `SUPER + Alt + V` | Pick an entry to delete it (e.g. a password copied by accident) |
+
+---
+
+## Notifications (swaync)
+
+| Keybind | Action |
+|---|---|
+| `SUPER + N` | Open/close the notification panel (history, media controls, clear all) |
+| `SUPER + Shift + N` | Toggle do-not-disturb |
+
+The bell in the bar shows the unread count: left-click opens the panel, right-click toggles do-not-disturb.
+Config: `~/.config/swaync/config.json`.
 
 ---
 
