@@ -697,8 +697,12 @@ Config: `~/.config/swaync/config.json`.
 - **Wallpaper colors**: soft, rounded look; colors come from the wallpaper. Choosing it from the
   menu restores the last wallpaper you used in this mode (default: CachyOS Skyscraper).
 - **Deus Ex**: faceted black geometry with gold edges, sharp corners, subtle gold glow.
-- **Samurai**: ink black, crimson and bone white; a red sun cut by a sword stroke, sharp corners.
+- **Samurai**: Cyberpunk-2077-style hi-tech samurai: red neon mask, circuit traces and HUD on black;
+  red and chrome UI, sharp corners.
 - **Fallout Terminal**: green phosphor monochrome with a CRT screen shader (scanlines + vignette).
+  The wallpaper is a terminal showing your system info and a keybind reference, refreshed each time
+  the theme is applied. For a text-free screen, set `"wallpaper"` in `presets/fallout.json` to
+  `~/Pictures/Wallpapers/themes/fallout-plain.png` and remove `"wallpaper_cmd"`.
   The shader lives in `~/.config/hypr/shaders/crt.glsl`; other themes switch it off.
 
 Everything follows the theme: window borders (animated gradient), waybar, rofi, notifications,

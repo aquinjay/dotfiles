@@ -1,22 +1,57 @@
 #!/usr/bin/env python3
 """Generate the wallpapers used by the theme presets.
 
-Writes SVGs and renders them to PNG with rsvg-convert:
-    ~/Pictures/Wallpapers/themes/deus-ex.png    black faceted geometry, gold edges
-    ~/Pictures/Wallpapers/themes/samurai.png    ink black, split red sun, hanko seal
-    ~/Pictures/Wallpapers/themes/fallout.png    green phosphor CRT terminal
+Writes SVGs and renders them to PNG with rsvg-convert, into ~/Pictures/Wallpapers/themes/:
+    deus-ex.png        black faceted geometry, gold edges
+    samurai.png        hi-tech samurai mask in red neon, circuits and HUD (black / red / chrome)
+    fallout.png        green CRT terminal showing live system info and a keybind reference
+    fallout-plain.png  the same CRT screen with no text
 
-Usage: gen-theme-wallpapers.py [WIDTH HEIGHT]   (default 1920 1080)
-Uses fixed seeds, so the output is the same every time.
+Usage: gen-theme-wallpapers.py [NAME ...] [--size WIDTHxHEIGHT]
+    NAME is deus-ex, samurai or fallout (default: all). The size defaults to the
+    focused monitor's resolution. Fixed seeds, so the art is the same every run;
+    fallout.png picks up fresh system info each time (theme.sh re-runs it on apply).
 """
+import getpass
+import json
 import math
 import os
+import platform
+import pwd
 import random
+import shutil
+import socket
 import subprocess
 import sys
+import time
 
-W, H = (int(sys.argv[1]), int(sys.argv[2])) if len(sys.argv) == 3 else (1920, 1080)
+
+def monitor_size():
+    try:
+        mons = json.loads(subprocess.run(["hyprctl", "monitors", "-j"], capture_output=True, text=True).stdout)
+        m = next((m for m in mons if m.get("focused")), mons[0])
+        return int(m["width"]), int(m["height"])
+    except Exception:
+        return 1920, 1080
+
+
+args = sys.argv[1:]
+if "--size" in args:
+    i = args.index("--size")
+    W, H = (int(v) for v in args[i + 1].lower().split("x"))
+    del args[i:i + 2]
+else:
+    W, H = monitor_size()
+NAMES = args or ["deus-ex", "samurai", "fallout"]
 OUT = os.path.expanduser("~/Pictures/Wallpapers/themes")
+
+
+def esc(t):
+    return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def pts(points):
+    return " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
 
 
 def scanlines(opacity, step=4):
@@ -81,123 +116,213 @@ def deus_ex():
 
 
 def samurai():
-    """Ink-black paper, a red sun cut in two by a sword stroke, a hanko seal and a bushido column."""
-    rnd = random.Random(1600)
-    sx, sy, sr = W * 0.64, H * 0.44, H * 0.30       # sun
-    # the cut: a line through the sun at ~-28 degrees; the two halves slide apart along it
-    ang = math.radians(-28)
-    ux, uy = math.cos(ang), math.sin(ang)
-    off = 9
-    big = 4000
-    half_a = f"{sx - ux * big:.0f},{sy - uy * big:.0f} {sx + ux * big:.0f},{sy + uy * big:.0f} {sx + ux * big - uy * big:.0f},{sy + uy * big + ux * big:.0f} {sx - ux * big - uy * big:.0f},{sy - uy * big + ux * big:.0f}"
-    half_b = f"{sx - ux * big:.0f},{sy - uy * big:.0f} {sx + ux * big:.0f},{sy + uy * big:.0f} {sx + ux * big + uy * big:.0f},{sy + uy * big - ux * big:.0f} {sx - ux * big + uy * big:.0f},{sy - uy * big - ux * big:.0f}"
-    petals = []
-    for _ in range(14):
-        x, y = rnd.uniform(W * 0.05, W * 0.98), rnd.uniform(H * 0.05, H * 0.95)
-        s = rnd.uniform(5, 11)
-        petals.append(f'<ellipse cx="{x:.0f}" cy="{y:.0f}" rx="{s:.1f}" ry="{s * 0.55:.1f}" '
-                      f'transform="rotate({rnd.uniform(0, 180):.0f} {x:.0f} {y:.0f})" opacity="{rnd.uniform(0.35, 0.8):.2f}"/>')
-    kx, ky = W * 0.12, H * 0.72                     # seal position
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}">
+    """Hi-tech samurai: an angular kabuto + menpo mask outlined in red neon, circuit traces, HUD, glitch."""
+    rnd = random.Random(2023)
+    RED, DEEP, CHROME, STEEL = "#ff1f3d", "#8a0f1f", "#d6dbe4", "#5d6b7e"
+    cx, cy, sc = W * 0.66, H * 0.53, H / 1080
+
+    def T(points):                                   # local mask coords -> screen
+        return [(cx + x * sc, cy + y * sc) for x, y in points]
+
+    def sym(right):                                  # right half -> full symmetric outline
+        return right + [(-x, y) for x, y in reversed(right)]
+
+    def mirror(points):
+        return [(-x, y) for x, y in points]
+
+    blade = [(10, -165), (60, -232), (150, -335), (275, -440), (205, -322), (112, -222), (40, -160)]
+    bowl = sym([(0, -168), (70, -162), (135, -136), (182, -94), (204, -42), (210, -8)])
+    brim = [(-236, -12), (236, -12), (256, 22), (-256, 22)]
+    flap = [(208, -36), (305, -78), (338, 6), (254, 62), (218, 22)]
+    menpo = sym([(0, 32), (82, 34), (152, 52), (178, 98), (168, 152), (132, 208), (82, 248), (30, 266)])
+    eye = [(30, 92), (70, 74), (156, 58), (146, 84), (62, 102)]
+    mouth = [(-96, 196), (96, 196), (80, 236), (-80, 236)]
+    gem = [(0, -238), (28, -192), (0, -150), (-28, -192)]
+
+    solids, lines = [], []
+    for poly in (bowl, menpo):
+        solids.append(f'<polygon points="{pts(T(poly))}"/>')
+    for poly in (blade, mirror(blade), flap, mirror(flap), brim, gem, mouth):
+        solids.append(f'<polygon points="{pts(T(poly))}"/>')
+    for i in range(4):                               # shikoro: lamellar neck guard
+        band = [(214 + i * 10, 40 + i * 38), (330 + i * 20, 30 + i * 46), (342 + i * 20, 62 + i * 46), (219 + i * 10, 72 + i * 38)]
+        solids.append(f'<polygon points="{pts(T(band))}"/>')
+        solids.append(f'<polygon points="{pts(T(mirror(band)))}"/>')
+    for x in range(-60, 61, 20):                     # mouth guard teeth
+        lines.append(T([(x, 200), (x * 0.86, 232)]))
+    lines += [T([(0, 104), (0, 172)]), T([(0, 172), (26, 184)]), T([(0, 172), (-26, 184)])]
+    for side in (1, -1):                             # tech lines on the cheeks and helmet
+        lines.append(T([(side * 150, 112), (side * 112, 132), (side * 112, 176), (side * 92, 190)]))
+        lines.append(T([(side * 60, -140), (side * 120, -112), (side * 150, -70)]))
+        lines.append(T([(side * 20, -60), (side * 90, -60), (side * 120, -30)]))
+    for k in range(3):
+        lines.append(T([(-34, 248 + k * 6), (34, 248 + k * 6)]))
+    line_svg = "".join(f'<polyline points="{pts(l)}" fill="none"/>' for l in lines)
+    eyes = "".join(f'<polygon points="{pts(T(p))}"/>' for p in (eye, mirror(eye)))
+
+    # circuit traces running out from the mask
+    traces, pads = [], []
+    for _ in range(46):
+        a = rnd.uniform(0, 2 * math.pi)
+        x, y = cx + math.cos(a) * 260 * sc, cy + math.sin(a) * 300 * sc
+        path = [(x, y)]
+        for _ in range(rnd.randint(2, 5)):
+            d = rnd.choice([0, 45, 90, 135, 180, 225, 270, 315])
+            # bias outward
+            out = math.degrees(math.atan2(y - cy, x - cx))
+            d = d if abs((d - out + 180) % 360 - 180) < 100 else (d + 180) % 360
+            step = rnd.uniform(40, 160) * sc
+            x += math.cos(math.radians(d)) * step
+            y += math.sin(math.radians(d)) * step
+            path.append((x, y))
+        op = rnd.uniform(0.18, 0.5)
+        traces.append(f'<polyline points="{pts(path)}" opacity="{op:.2f}"/>')
+        pads.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{3 * sc:.1f}" opacity="{op + 0.2:.2f}"/>')
+
+    # glitch: horizontal slices of the mask shifted sideways
+    glitch_defs, glitch_use = [], []
+    for i in range(6):
+        y0 = cy + rnd.uniform(-420, 260) * sc
+        hgt = rnd.uniform(4, 18) * sc
+        dx = rnd.choice([-1, 1]) * rnd.uniform(12, 46) * sc
+        glitch_defs.append(f'<clipPath id="g{i}"><rect x="0" y="{y0:.0f}" width="{W}" height="{hgt:.0f}"/></clipPath>')
+        glitch_use.append(f'<use href="#mask" clip-path="url(#g{i})" transform="translate({dx:.0f} 0)" opacity="0.85"/>')
+
+    m = 60 * sc                                      # HUD corner brackets
+    br = 70 * sc
+    brackets = "".join(f'<polyline points="{pts(p)}" fill="none"/>' for p in (
+        [(m, m + br), (m, m), (m + br, m)], [(W - m - br, m), (W - m, m), (W - m, m + br)],
+        [(m, H - m - br), (m, H - m), (m + br, H - m)], [(W - m - br, H - m), (W - m, H - m), (W - m, H - m - br)]))
+    mono = "MesloLGS Nerd Font Mono"
+    hud = f"""
+<g font-family="{mono}" font-size="{15 * sc:.0f}" fill="{CHROME}" opacity="0.55">
+  <text x="{m + 20 * sc:.0f}" y="{m + 34 * sc:.0f}">侍 // SAMURAI.SYS  ONLINE</text>
+  <text x="{m + 20 * sc:.0f}" y="{m + 56 * sc:.0f}" fill="{STEEL}">NEURAL LINK ........ STABLE</text>
+  <text x="{m + 20 * sc:.0f}" y="{m + 78 * sc:.0f}" fill="{STEEL}">CYBERWARE .......... 87%</text>
+  <text x="{W - m - 20 * sc:.0f}" y="{H - m - 22 * sc:.0f}" text-anchor="end">35.6762 N  139.6503 E</text>
+  <text x="{W - m - 20 * sc:.0f}" y="{H - m - 44 * sc:.0f}" text-anchor="end" fill="{RED}">// WAKE UP. WE HAVE A CITY TO BURN</text>
+</g>"""
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{W}" height="{H}">
 <defs>
-  <filter id="paper" x="0" y="0" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" result="n"/>
-    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.08  0 0 0 0 0.06  0 0 0 0 0.05  0 0 0 0.9 0"/>
-  </filter>
-  <filter id="brush" x="-10%" y="-10%" width="120%" height="120%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="9" result="t"/>
-    <feDisplacementMap in="SourceGraphic" in2="t" scale="22" xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
-  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
-  <filter id="haze" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="70"/></filter>
-  <radialGradient id="sun" cx="0.45" cy="0.4" r="0.7">
-    <stop offset="0" stop-color="#ff3a4c"/><stop offset="1" stop-color="#a50f1f"/>
+  <radialGradient id="halo" cx="{cx / W:.2f}" cy="{(cy - 80 * sc) / H:.2f}" r="0.45">
+    <stop offset="0" stop-color="{DEEP}" stop-opacity="0.55"/><stop offset="1" stop-color="{DEEP}" stop-opacity="0"/>
   </radialGradient>
-  <clipPath id="ca"><polygon points="{half_a}"/></clipPath>
-  <clipPath id="cb"><polygon points="{half_b}"/></clipPath>
-  {vignette(0.85)}
+  <linearGradient id="armor" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#17171c"/><stop offset="1" stop-color="#09090b"/>
+  </linearGradient>
+  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="{5 * sc:.1f}"/></filter>
+  <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="{1.6 * sc:.1f}"/></filter>
+  {''.join(glitch_defs)}
+  <g id="mask">
+    <g fill="url(#armor)" stroke="{RED}" stroke-width="{2.6 * sc:.1f}" stroke-linejoin="miter">{''.join(solids)}</g>
+    <g stroke="{RED}" stroke-width="{1.6 * sc:.1f}" opacity="0.8">{line_svg}</g>
+    <g fill="#ff3b55">{eyes}</g>
+    <g fill="#fff4f5" filter="url(#soft)" opacity="0.8">{eyes}</g>
+  </g>
+  {vignette(0.8)}
+  {scanlines(0.3)}
 </defs>
-<rect width="100%" height="100%" fill="#0b0909"/>
-<rect width="100%" height="100%" filter="url(#paper)"/>
-<circle cx="{sx:.0f}" cy="{sy:.0f}" r="{sr * 1.05:.0f}" fill="#e0243a" opacity="0.22" filter="url(#haze)"/>
-<g filter="url(#brush)">
-  <g transform="translate({-uy * off - ux * 16:.1f} {ux * off - uy * 16:.1f})">
-    <circle cx="{sx:.0f}" cy="{sy:.0f}" r="{sr:.0f}" fill="url(#sun)" clip-path="url(#ca)"/>
-  </g>
-  <g transform="translate({uy * off + ux * 16:.1f} {-ux * off + uy * 16:.1f})">
-    <circle cx="{sx:.0f}" cy="{sy:.0f}" r="{sr:.0f}" fill="url(#sun)" clip-path="url(#cb)"/>
-  </g>
+<rect width="100%" height="100%" fill="#08080a"/>
+<rect width="100%" height="100%" fill="url(#halo)"/>
+<g stroke="{RED}" stroke-width="{1.4 * sc:.1f}" fill="none">{''.join(traces)}</g>
+<g fill="{RED}">{''.join(pads)}</g>
+<text x="{W * 0.1:.0f}" y="{H * 0.18:.0f}" font-family="Noto Sans CJK JP" font-weight="900" font-size="{150 * sc:.0f}"
+      fill="{RED}" opacity="0.16" writing-mode="tb">サムライ</text>
+<g stroke="{RED}" stroke-width="{6 * sc:.1f}" filter="url(#glow)" opacity="0.55" fill="none">
+  <use href="#mask"/>
 </g>
-<line x1="{sx - ux * W:.0f}" y1="{sy - uy * W:.0f}" x2="{sx + ux * W:.0f}" y2="{sy + uy * W:.0f}"
-      stroke="#f4ece0" stroke-width="5" opacity="0.55" filter="url(#glow)"/>
-<line x1="{sx - ux * W:.0f}" y1="{sy - uy * W:.0f}" x2="{sx + ux * W:.0f}" y2="{sy + uy * W:.0f}"
-      stroke="#fffaf2" stroke-width="1.6"/>
-<g fill="#e0243a">{''.join(petals)}</g>
-<text x="{W * 0.9:.0f}" y="{H * 0.16:.0f}" font-family="AR PL New Kai" font-size="64" fill="#e8dcc4" opacity="0.28"
-      writing-mode="tb" letter-spacing="18">武士道</text>
-<g transform="translate({kx:.0f} {ky:.0f}) rotate(-4)">
-  <rect x="-62" y="-62" width="124" height="124" rx="10" fill="#c8102e" filter="url(#brush)" opacity="0.92"/>
-  <text x="0" y="40" text-anchor="middle" font-family="AR PL New Kai" font-size="112" fill="#0b0909">侍</text>
-</g>
+<use href="#mask"/>
+{''.join(glitch_use)}
+<g stroke="{CHROME}" stroke-width="{1.5 * sc:.1f}" opacity="0.5">{brackets}</g>
+{hud}
 <rect width="100%" height="100%" fill="url(#vig)"/>
+<rect width="100%" height="100%" fill="url(#scan)"/>
 </svg>"""
 
 
-def fallout():
-    """Green phosphor CRT showing a terminal hacking screen."""
-    rnd = random.Random(2287)
-    green, dim = "#1aff80", "#12a356"
-    fs, lh = 24, 32
-    x0, y0 = W * 0.09, H * 0.13
-    lines = [
-        ("ROBCO INDUSTRIES (TM) TERMLINK PROTOCOL", green),
-        ("ENTER PASSWORD NOW", green),
-        ("", green),
-        ("4 ATTEMPT(S) LEFT:  █ █ █ █", green),
-        ("", green),
+def system_info():
+    def read(path):
+        try:
+            with open(path) as f:
+                return f.read()
+        except OSError:
+            return ""
+
+    osrel = dict(l.split("=", 1) for l in read("/etc/os-release").splitlines() if "=" in l)
+    cpu = next((l.split(":", 1)[1].strip() for l in read("/proc/cpuinfo").splitlines() if l.startswith("model name")), "unknown")
+    mem_kb = next((int(l.split()[1]) for l in read("/proc/meminfo").splitlines() if l.startswith("MemTotal")), 0)
+    du = shutil.disk_usage("/")
+    try:
+        hypr = json.loads(subprocess.run(["hyprctl", "version", "-j"], capture_output=True, text=True).stdout).get("tag", "?")
+    except Exception:
+        hypr = "?"
+    return [
+        ("OPERATOR", f"{getpass.getuser()}@{socket.gethostname()}"),
+        ("SYSTEM", osrel.get("PRETTY_NAME", "Linux").strip('"')),
+        ("KERNEL", platform.release()),
+        ("COMPOSITOR", f"Hyprland {hypr}"),
+        ("PROCESSOR", " ".join(cpu.split())[:38]),
+        ("MEMORY", f"{mem_kb / 1048576:.1f} GB"),
+        ("STORAGE /", f"{du.used / 1e9:.0f} / {du.total / 1e9:.0f} GB used"),
+        ("SHELL", os.path.basename(pwd.getpwuid(os.getuid()).pw_shell)),
+        ("LAST SYNC", time.strftime("%Y-%m-%d %H:%M")),
     ]
-    junk = "!@#$%^&*()-_=+[]{}<>/\\|;:'\",.?"
-    words = ["VAULT", "STEEL", "PIPES", "ATOMS", "RADIO", "BUNKR", "TERMS", "OVERS", "NUKES", "POWER"]
-    addr = 0xF4A0
-    rows = []
-    for i in range(16):
-        cols = []
-        for half in range(2):
-            s = "".join(rnd.choice(junk) for _ in range(12))
-            if rnd.random() < 0.35:
-                w = rnd.choice(words)
-                p = rnd.randrange(0, 12 - len(w))
-                s = s[:p] + w + s[p + len(w):]
-            cols.append(f"0x{addr + (half * 16 + i) * 12:04X} {s}")
-        rows.append("   ".join(cols))
-    side = [">" + rnd.choice(words), ">Entry denied", ">1/5 correct.", ">" + rnd.choice(words),
-            ">Entry denied", ">3/5 correct.", ">", ">"]
-    texts = []
-    y = y0
-    for t, c in lines:
-        texts.append(f'<text x="{x0:.0f}" y="{y:.0f}" fill="{c}">{t}</text>')
-        y += lh
-    for i, row in enumerate(rows):
-        texts.append(f'<text x="{x0:.0f}" y="{y + i * lh:.0f}" fill="{green}" xml:space="preserve">'
-                     f'{row.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")}</text>')
-    sx = x0 + fs * 0.6 * 44
-    for i, t in enumerate(side):
-        texts.append(f'<text x="{sx:.0f}" y="{y + (len(rows) - len(side) + i) * lh:.0f}" fill="{dim}">'
-                     f'{t.replace(">", "&gt;")}</text>')
-    cy = y + (len(rows) - 1) * lh
-    cursor = f'<rect x="{sx + fs * 0.6 * 1.2:.0f}" y="{cy - fs + 4:.0f}" width="{fs * 0.6:.0f}" height="{fs:.0f}" fill="{green}"/>'
+
+
+KEYS = [
+    ("TERMINAL", "SUPER+ENTER"), ("LAUNCHER", "SUPER+SPACE"), ("WINDOWS", "ALT+TAB"),
+    ("CLOSE", "SUPER+Q"), ("FULLSCREEN", "SUPER+F"), ("FLOAT", "SUPER+V"),
+    ("FOCUS", "SUPER+H/J/K/L"), ("TOGGLE BAR", "SUPER+B"), ("NOTIFICATIONS", "SUPER+N"),
+    ("CLIPBOARD", "SUPER+SHIFT+V"), ("SCREENSHOT", "SUPER+SHIFT+S"), ("FILES", "SUPER+E"),
+    ("THEMES", "SUPER+SHIFT+T"), ("WALLPAPER", "SUPER+SHIFT+W"), ("LOCK", "SUPER+ESC"),
+]
+
+
+def fallout(with_text=True):
+    """Green phosphor CRT. With text: live system info and a keybind reference, terminal style."""
+    green, dim, faint = "#1aff80", "#12a356", "#0b5c31"
+    sc = H / 1080
+    fs, lh = 25 * sc, 38 * sc
+    cw = fs * 0.6                                    # monospace cell width
+    x0, y0 = W * 0.07, H * 0.12
+    out = []
+
+    def line(x, y, text, color=green):
+        out.append(f'<text x="{x:.0f}" y="{y:.0f}" fill="{color}" xml:space="preserve">{esc(text)}</text>')
+
+    if with_text:
+        line(x0, y0, "ROBCO INDUSTRIES (TM) TERMLINK PROTOCOL")
+        line(x0, y0 + lh, f"WELCOME, {getpass.getuser().upper()}")
+        col2 = x0 + cw * 58
+        y = y0 + lh * 3
+        line(x0, y, "> SYSTEM STATUS")
+        line(col2, y, "> COMMAND REFERENCE")
+        line(x0, y + lh * 0.55, "-" * 48, faint)
+        line(col2, y + lh * 0.55, "-" * 36, faint)
+        y += lh * 1.4
+        for i, (k, v) in enumerate(system_info()):
+            line(x0, y + i * lh, f"{k:<12}", dim)
+            line(x0 + cw * 13, y + i * lh, v)
+        for i, (k, v) in enumerate(KEYS):
+            line(col2, y + i * lh, f"{k} {'.' * (20 - len(k))} ", dim)
+            line(col2 + cw * 22, y + i * lh, v)
+        py = y + max(len(KEYS), 9) * lh + lh * 0.6
+        line(x0, py, ">")
+        out.append(f'<rect x="{x0 + cw * 1.5:.0f}" y="{py - fs + 4 * sc:.0f}" width="{cw:.0f}" height="{fs:.0f}" fill="{green}"/>')
+    body = "".join(out)
+    mono = "MesloLGS Nerd Font Mono"
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}">
 <defs>
   <radialGradient id="screen" cx="0.5" cy="0.48" r="0.8">
     <stop offset="0" stop-color="#06301a"/><stop offset="0.6" stop-color="#03170b"/><stop offset="1" stop-color="#010603"/>
   </radialGradient>
-  <filter id="glow" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="3.5"/></filter>
+  <filter id="glow" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation="{3.5 * sc:.1f}"/></filter>
   {vignette(0.95)}
   {scanlines(0.45, 3)}
 </defs>
 <rect width="100%" height="100%" fill="url(#screen)"/>
-<g font-family="MesloLGS Nerd Font Mono" font-size="{fs}" filter="url(#glow)" opacity="0.9">{''.join(texts)}{cursor}</g>
-<g font-family="MesloLGS Nerd Font Mono" font-size="{fs}">{''.join(texts)}{cursor}</g>
+<g font-family="{mono}" font-size="{fs:.0f}" filter="url(#glow)" opacity="0.85">{body}</g>
+<g font-family="{mono}" font-size="{fs:.0f}">{body}</g>
 <rect width="100%" height="100%" fill="url(#scan)"/>
 <rect width="100%" height="100%" fill="url(#vig)"/>
 </svg>"""
@@ -213,6 +338,13 @@ def render(name, svg):
     print("wrote", os.path.join(OUT, name + ".png"))
 
 
-render("deus-ex", deus_ex())
-render("samurai", samurai())
-render("fallout", fallout())
+for name in NAMES:
+    if name == "deus-ex":
+        render("deus-ex", deus_ex())
+    elif name == "samurai":
+        render("samurai", samurai())
+    elif name == "fallout":
+        render("fallout", fallout())
+        render("fallout-plain", fallout(with_text=False))
+    else:
+        sys.exit(f"unknown wallpaper: {name}")

@@ -68,6 +68,10 @@ EOF
   local wall name
   wall=$(python3 -c 'import json,os,sys; print(os.path.expanduser(json.load(open(sys.argv[1]))["wallpaper"]))' "$file")
   name=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["name"])' "$file")
+  # Presets can regenerate their wallpaper first (Fallout refreshes its system info).
+  local cmd
+  cmd=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("wallpaper_cmd", ""))' "$file")
+  [[ -n $cmd ]] && bash -c "$cmd" >/dev/null
   [[ -f $wall ]] && set_wallpaper "$wall"
   matugen json "$cache/preset.json" -q --import-json-string "$(style_json "$file")"
   echo "preset:$1" > "$state"
