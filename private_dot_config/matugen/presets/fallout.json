@@ -1,0 +1,30 @@
+{
+  "name": "Fallout Terminal",
+  "wallpaper": "~/Pictures/Wallpapers/themes/fallout.png",
+  "style": {
+    "rounding": 4, "border_size": 2, "radius": 2, "radius_lg": 4,
+    "font": "JetBrainsMono Nerd Font", "font_fallback": "MesloLGS Nerd Font",
+    "glow": "rgba(1aff8055)", "shadow_range": 18,
+    "screen_shader": "~/.config/hypr/shaders/crt.glsl",
+    "module_border": "1px solid alpha(@primary, 0.45)"
+  },
+  "colors": {
+    "primary": "#1aff80", "on_primary": "#00200d",
+    "primary_container": "#0a4a26", "on_primary_container": "#b8ffd6",
+    "secondary": "#12b85c", "secondary_container": "#0a3d20",
+    "tertiary": "#9dffc4",
+    "error": "#ffb641",
+    "surface": "#020d05", "surface_container_lowest": "#010803",
+    "surface_container_low": "#04140a", "surface_container": "#061a0d",
+    "surface_container_high": "#0a2414", "surface_container_highest": "#0f2e1a",
+    "on_surface": "#1aff80", "on_surface_variant": "#12a356",
+    "outline": "#0f7a40", "outline_variant": "#0a3d20",
+    "shadow": "#000000"
+  },
+  "base16": {
+    "base00": "#020d05", "base01": "#061a0d", "base02": "#0a2414", "base03": "#0f5a30",
+    "base04": "#12a356", "base05": "#1aff80", "base06": "#6bffab", "base07": "#b8ffd6",
+    "base08": "#ffb641", "base09": "#ffd27a", "base0a": "#d4ff6b", "base0b": "#1aff80",
+    "base0c": "#6bffd4", "base0d": "#3dffa0", "base0e": "#a0ffcc", "base0f": "#0f7a40"
+  }
+}

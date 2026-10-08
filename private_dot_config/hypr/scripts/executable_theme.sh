@@ -29,11 +29,12 @@ set_wallpaper() {
 # Prints the style JSON with "font" swapped for "font_fallback" when the font isn't installed.
 style_json() {
   python3 - "$1" <<'EOF'
-import json, subprocess, sys
+import json, os, subprocess, sys
 src = json.load(open(sys.argv[1]))
 style = src.get("style", src)
 if subprocess.run(["fc-list", "-q", style["font"]]).returncode != 0:
     style["font"] = style["font_fallback"]
+style["screen_shader"] = os.path.expanduser(style.get("screen_shader", ""))
 print(json.dumps({"style": style}))
 EOF
 }

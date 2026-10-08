@@ -95,6 +95,8 @@ hl.config({
   decoration = {
     active_opacity = 1,
     inactive_opacity = 0.95,
+    -- Full-screen shader (the Fallout preset uses a CRT effect); empty = off
+    screen_shader = theme.screen_shader or "",
     rounding = theme.rounding or 8,
     blur = {
       size = 15,
@@ -241,7 +243,7 @@ exec(mainMod .. " + SHIFT + M", [[loginctl terminate-user ""]])
 bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 exec(mainMod .. " + SPACE", applauncher)
 exec(mainMod .. " + SHIFT + W", [[~/.config/hypr/scripts/wallpaper.sh]]) -- pick wallpaper, re-theme everything
-exec(mainMod .. " + SHIFT + T", [[~/.config/hypr/scripts/theme.sh]]) -- theme menu: wallpaper colors / Deus Ex / Cyberpunk
+exec(mainMod .. " + SHIFT + T", [[~/.config/hypr/scripts/theme.sh]]) -- theme menu: wallpaper colors / Deus Ex / Samurai / Fallout
 exec("ALT + Tab", [[rofi -show window]])
 exec(mainMod .. " + SHIFT + SPACE", [[rofi -show emoji]]) -- picked emoji is copied; paste with Ctrl+V
 bind(mainMod .. " + F", hl.dsp.window.fullscreen({ action = "toggle" }))

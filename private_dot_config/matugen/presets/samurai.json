@@ -1,0 +1,29 @@
+{
+  "name": "Samurai",
+  "wallpaper": "~/Pictures/Wallpapers/themes/samurai.png",
+  "style": {
+    "rounding": 0, "border_size": 2, "radius": 0, "radius_lg": 0,
+    "font": "JetBrainsMono Nerd Font", "font_fallback": "MesloLGS Nerd Font",
+    "glow": "rgba(e0243a44)", "shadow_range": 22, "screen_shader": "",
+    "module_border": "1px solid alpha(@primary, 0.4)"
+  },
+  "colors": {
+    "primary": "#e0243a", "on_primary": "#1a0004",
+    "primary_container": "#5a0d17", "on_primary_container": "#ffd9dc",
+    "secondary": "#9e1b24", "secondary_container": "#3a0e12",
+    "tertiary": "#e8dcc4",
+    "error": "#ffb347",
+    "surface": "#0b0909", "surface_container_lowest": "#060505",
+    "surface_container_low": "#110d0d", "surface_container": "#161111",
+    "surface_container_high": "#201818", "surface_container_highest": "#2b2020",
+    "on_surface": "#ece4d8", "on_surface_variant": "#a39383",
+    "outline": "#6b4e4e", "outline_variant": "#3a2626",
+    "shadow": "#000000"
+  },
+  "base16": {
+    "base00": "#0b0909", "base01": "#161111", "base02": "#2b2020", "base03": "#5c4a4a",
+    "base04": "#a39383", "base05": "#ece4d8", "base06": "#f4ede2", "base07": "#fffaf2",
+    "base08": "#e0243a", "base09": "#e8743a", "base0a": "#d9b45a", "base0b": "#8fae6b",
+    "base0c": "#7fa8a0", "base0d": "#6d8fb5", "base0e": "#b0567d", "base0f": "#8a3a2a"
+  }
+}

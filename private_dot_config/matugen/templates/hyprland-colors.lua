@@ -15,4 +15,5 @@ return {
   rounding        = {{style.rounding}},
   border_size     = {{style.border_size}},
   shadow_range    = {{style.shadow_range}},
+  screen_shader   = "{{style.screen_shader}}",
 }
