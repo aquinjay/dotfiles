@@ -11,10 +11,10 @@ local terminal = "alacritty"
 local idlehandler = "hypridle" -- settings in ~/.config/hypr/hypridle.conf
 
 -- Screenshots
-local shot_region = [[grimblast -n copysave area ~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png]]
+local shot_region = [[grimblast -n --freeze copysave area ~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png]]
 local shot_window = [[grimblast -n copysave active ~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png]]
 local shot_screen = [[grimblast -n copysave output ~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png]]
-local shot_annotate = [[grimblast save area - | swappy -f -]] -- swappy settings: ~/.config/swappy/config
+local shot_annotate = [[grimblast --freeze save area - | swappy -f -]] -- swappy settings: ~/.config/swappy/config
 
 -- Colors
 local cachylgreen = "rgba(82dcccff)"
