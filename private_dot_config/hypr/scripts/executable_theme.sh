@@ -62,8 +62,14 @@ apply_preset() {
 import json, sys
 p = json.load(open(sys.argv[1]))
 wrap = lambda hexes: {k: {m: {"color": v} for m in ("dark", "default", "light")} for k, v in hexes.items()}
+# Terminal ANSI hues: wallpaper mode gets these from config.toml's custom_colors.
+ansi = dict(red="base08", green="base0b", yellow="base0a", blue="base0d", magenta="base0e", cyan="base0c")
+colors = dict(p["colors"])
+for name, slot in ansi.items():
+    colors.setdefault(name, p["base16"][slot])
+    colors.setdefault(f"on_{name}_container", p["base16"][slot])
 json.dump({"mode": "dark", "is_dark_mode": True,
-           "colors": wrap(p["colors"]), "base16": wrap(p["base16"])}, open(sys.argv[2], "w"))
+           "colors": wrap(colors), "base16": wrap(p["base16"])}, open(sys.argv[2], "w"))
 EOF
   local wall name
   wall=$(python3 -c 'import json,os,sys; print(os.path.expanduser(json.load(open(sys.argv[1]))["wallpaper"]))' "$file")

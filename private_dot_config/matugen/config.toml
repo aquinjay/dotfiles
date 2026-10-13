@@ -3,6 +3,17 @@
 
 [config]
 
+# Terminal ANSI hues, nudged toward the wallpaper and lightened so they read on the dark
+# background (matugen's base16 copies the wallpaper's own pixels, which can be near-black).
+# Presets fill these in from their base16 instead (see scripts/theme.sh).
+[config.custom_colors]
+red     = { color = "#e0504a", blend = true }
+green   = { color = "#5fbf5f", blend = true }
+yellow  = { color = "#e0c050", blend = true }
+blue    = { color = "#5090e0", blend = true }
+magenta = { color = "#c060c0", blend = true }
+cyan    = { color = "#50c0c0", blend = true }
+
 [templates.hyprland]
 input_path = '~/.config/matugen/templates/hyprland-colors.lua'
 output_path = '~/.config/hypr/colors.lua'
