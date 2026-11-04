@@ -1,6 +1,6 @@
 -- Initizialize the lazy plugin. Either find the path to lazy or install it in the specified location
 local lazypath = vim.fn.stdpath "data"  .. "/lazy/lazy.nvim" -- Gets the data direcotry path (usually .local/share/nvim) and concatenates another path to it 
-if not vim.loop.fs_stat(lazypath) then -- if the above does not exit, then install lazy.nvim
+if not vim.uv.fs_stat(lazypath) then -- if the above does not exit, then install lazy.nvim
   vim.fn.system({ -- executes shell commands
     "git",
     "clone",
@@ -23,6 +23,10 @@ require("lazy").setup({
   },
   ui = {
     border = "rounded",
+  },
+  -- No plugin here needs luarocks; disabling it clears the :checkhealth lazy error.
+  rocks = {
+    enabled = false,
   },
   change_detection = {
     enabled = true,

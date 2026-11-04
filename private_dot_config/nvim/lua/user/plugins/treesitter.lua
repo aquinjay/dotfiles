@@ -3,36 +3,70 @@
 -- 🧭 QUICK REFERENCE — Treesitter
 --
 -- What this file does
---   • Installs & configures parsers for fast, accurate syntax highlighting.
---   • Enables incremental selection (expand/shrink selection by syntax node).
+--   • Installs parsers + queries via nvim-treesitter (main branch).
+--   • Starts Neovim's built-in treesitter highlighting per buffer.
 --   • Enables indent powered by trees (where parsers support it).
 --   • Auto-installs missing parsers on demand.
 --   • Skips Treesitter on very large files to avoid lag.
+--   • Maps incremental selection onto Neovim 0.12's built-in node selection.
+--
+-- Why it looks like this (Neovim 0.12)
+--   • nvim-treesitter's old `master` branch is frozen and breaks on 0.12
+--     (its query directives crash markdown injections). The `main` branch is a
+--     rewrite: it only installs parsers/queries. Highlighting, folds, and
+--     selection are now core Neovim features we switch on ourselves.
+--   • Requires `tree-sitter-cli` (pacman: tree-sitter-cli) + a C compiler.
 --
 -- How to use
---   • Selection: <CR> to expand, <BS> to shrink (in visual/select mode).
---     (Change keys below if you prefer.)
+--   • Selection: <CR> to start/expand, <BS> to shrink (visual mode).
+--     Built-in equivalents also work: `an` (outwards), `in` (inwards),
+--     `]n`/`[n` (next/prev node). See :h treesitter-incremental-selection
 --   • Run :TSUpdate occasionally to keep parsers fresh (also done on build).
+--   • :checkhealth nvim-treesitter → parser/tooling status.
 --
 -- Extend later (easy bolt-ons)
---   • Textobjects: add "nvim-treesitter/nvim-treesitter-textobjects".
---   • Context commentstring: add "JoosepAlviste/nvim-ts-context-commentstring".
+--   • Textobjects: add "nvim-treesitter/nvim-treesitter-textobjects" (main branch).
 --   • Autotag for HTML/TSX: add "windwp/nvim-ts-autotag".
 -- ============================================================================
 
 ---@type LazyPluginSpec
 local M = {
   "nvim-treesitter/nvim-treesitter",
-  branch = "master",
-  lazy = false,
+  branch = "main",
+  lazy = false, -- the main branch does not support lazy-loading
   build = ":TSUpdate",
 }
 
 function M.config()
+  local ts = require "nvim-treesitter"
+
+  -- Install just what you use; add more as needed. No-op if already installed.
+  ts.install {
+    "lua",
+    "markdown",
+    "markdown_inline",
+    "bash",
+    "python",
+    "vue",
+    "typescript",
+    "tsx",
+    "javascript",
+    "html",
+    "css",
+    "scss",
+    "json",
+    "yaml",
+    "toml",
+    "regex",
+    "vim",
+    "vimdoc",
+    -- add: "go","rust","cpp" ...
+  }
+
   -- Heuristic: disable Treesitter on very large files to keep things snappy.
   local function too_large(lang, buf)
     local max_filesize = 200 * 1024 -- 200 KB
-    local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
     if ok and stats and stats.size > max_filesize then
       vim.schedule(function()
         vim.notify(("Treesitter disabled for large %s file (> %d KB)"):format(lang, max_filesize / 1024),
@@ -43,72 +77,65 @@ function M.config()
     return false
   end
 
-  require("nvim-treesitter.configs").setup {
-    -- Install just what you use; add more as needed.
-    ensure_installed = {
-      "lua",
-      "markdown",
-      "markdown_inline",
-      "bash",
-      "python",
-      "vue",
-      "typescript",
-      "tsx",
-      "javascript",
-      "html",
-      "css",
-      "scss",
-      "json",
-      "yaml",
-      "toml",
-      "regex",
-      "vim",
-      "vimdoc",
-      -- add: "typescript","tsx","html","css","go","rust","cpp" ...
-    },
+  -- Languages nvim-treesitter knows how to install (built once, on first use).
+  local available
+  local function is_available(lang)
+    if not available then
+      available = {}
+      for _, l in ipairs(ts.get_available()) do
+        available[l] = true
+      end
+    end
+    return available[lang]
+  end
 
-    -- Parser management
-    sync_install = false,     -- async installs are fine
-    auto_install = true,      -- install missing parsers when entering buffer
-    ignore_install = {},
+  local function attach(buf, lang)
+    if not vim.api.nvim_buf_is_valid(buf) then return end
 
-    -- Highlighting
-    highlight = {
-      enable = true,
-      disable = function(lang, buf) return too_large(lang, buf) end,
-      additional_vim_regex_highlighting = false, -- avoid double-highlighting
-    },
+    -- Highlighting (regex syntax stays off to avoid double-highlighting)
+    if not pcall(vim.treesitter.start, buf, lang) then return end
 
-    -- Indentation (parser-specific; falls back gracefully where unsupported)
-    -- Vue indentation is disabled because its mixed-language queries can crash
-    -- through nvim-treesitter indent/query predicates while editing .vue files.
-    indent = {
-      enable = true,
-      disable = function(lang, buf)
-        return lang == "vue" or too_large(lang, buf)
-      end,
-    },
+    -- Indentation (experimental in nvim-treesitter). Vue stays off because its
+    -- mixed-language indent queries misbehave while editing .vue files.
+    if lang ~= "vue" then
+      vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    end
 
-    -- Incremental selection (super handy for refactors)
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        init_selection = "<CR>",       -- start selection at cursor
-        node_incremental = "<CR>",     -- grow to next node
-        scope_incremental = "<S-CR>",  -- grow to scope
-        node_decremental = "<BS>",     -- shrink
-      },
-    },
+    -- Incremental selection: keep the old keys, backed by 0.12's built-in
+    -- `an`/`in` visual mappings (which fall back to LSP selectionRange).
+    local map = function(mode, lhs, rhs, desc)
+      vim.keymap.set(mode, lhs, rhs, { buffer = buf, remap = true, silent = true, desc = desc })
+    end
+    map("n", "<CR>", "van", "Start syntax selection")
+    map("x", "<CR>", "an", "Expand syntax selection")
+    map("x", "<BS>", "in", "Shrink syntax selection")
+  end
 
-    -- If you use "andymass/vim-matchup", Treesitter can improve it:
-    matchup = { enable = true },
+  vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("user_treesitter", { clear = true }),
+    callback = function(ev)
+      local lang = vim.treesitter.language.get_lang(ev.match)
+      if not lang then return end
 
-    -- If you add autotag plugin later:
-    -- autotag = { enable = true },
-    --
-    -- If you add context-commentstring plugin later (pairs nicely with Comment.nvim):
-    -- context_commentstring = { enable = true, enable_autocmd = false },
-  }
+      if too_large(lang, ev.buf) then
+        -- Some filetypes (e.g. markdown) start treesitter from their ftplugin,
+        -- which runs after this autocmd, so stop it once that has happened.
+        vim.schedule(function() pcall(vim.treesitter.stop, ev.buf) end)
+        return
+      end
+
+      if vim.treesitter.language.add(lang) then
+        attach(ev.buf, lang)
+      elseif is_available(lang) then
+        -- auto_install: fetch the missing parser, then attach.
+        ts.install(lang):await(function(err)
+          if not err then
+            vim.schedule(function() attach(ev.buf, lang) end)
+          end
+        end)
+      end
+    end,
+  })
 end
 
 return M

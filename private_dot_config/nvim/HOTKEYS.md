@@ -114,10 +114,21 @@ Inside Telescope:
 
 | Goal | Key | Mode |
 |---|---:|---|
-| Start/increase syntax selection | `<CR>` | visual/select |
-| Increase to scope | `<S-CR>` | visual/select |
-| Shrink syntax selection | `<BS>` | visual/select |
+| Start syntax selection | `<CR>` | normal |
+| Increase syntax selection | `<CR>` or `an` | visual |
+| Shrink syntax selection | `<BS>` or `in` | visual |
+| Select next / previous node | `]n` / `[n` | visual |
+| Extend selection to next / previous node | `]N` / `[N` | visual |
 | Update parsers | `:TSUpdate` | command |
+
+`an`, `in`, `]n`, `[n`, `]N` and `[N` are built into Neovim 0.12 (`:h treesitter-incremental-selection`). The old `<S-CR>` "grow to scope" has no built-in equivalent and was dropped.
+
+## LSP
+
+| Goal | Key / Command | Mode |
+|---|---:|---|
+| Toggle inlay hints | `<leader>lh` | normal |
+| Manage clients (restart/stop) | `:lsp` | command |
 
 ## Illuminated references
 
@@ -154,7 +165,7 @@ Inside Telescope:
 | Inspect active keymaps | `:map` | Built-in Vim map list |
 | Inspect normal maps | `:nmap` | Normal mode only |
 | Inspect plugin status | `:Lazy` | Plugin manager |
-| Check LSP | `:LspInfo` | Active language servers |
+| Check LSP | `:checkhealth vim.lsp` (or `:LspInfo`) | Active language servers |
 | Check Treesitter | `:checkhealth nvim-treesitter` | Parser/plugin health |
 
 ## Suggested muscle-memory path

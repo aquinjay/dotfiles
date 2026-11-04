@@ -8,7 +8,7 @@ return {
     local dashboard = require("alpha.themes.dashboard")
 
     -- Seed randomness once per startup so a new header is chosen each launch
-    math.randomseed(vim.loop.hrtime())
+    math.randomseed(vim.uv.hrtime())
 
     -- Rotating headers
     local headers = {

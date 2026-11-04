@@ -4,11 +4,9 @@ local M = {}
 M.filetypes = { "vue" }
 
 M.settings = (function()
-  local util = require "lspconfig.util"
-  local cwd = vim.loop.cwd() or ""
-  local tsdk = util.path.join(cwd, "node_modules", "typescript", "lib")
+  local tsdk = vim.fs.joinpath(vim.uv.cwd() or "", "node_modules", "typescript", "lib")
   -- If workspace TS is present, prefer it; else fallback to Volar’s bundled TS
-  if not (vim.loop.fs_stat(tsdk) and tsdk) then
+  if not vim.uv.fs_stat(tsdk) then
     tsdk = ""
   end
   return {
@@ -18,4 +16,3 @@ M.settings = (function()
 end)()
 
 return M
-

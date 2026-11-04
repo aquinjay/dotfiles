@@ -10,14 +10,21 @@
 --   • Optional per-server overrides live in user.plugins.lspsettings/*.lua
 --
 -- Why this exists (in plain terms):
---   • Neovim 0.11 uses vim.lsp.config + vim.lsp.enable. This file centralizes that setup.
---   • It makes LSP startup explicit and filetype-driven, so you always know what runs where.
---   • It avoids the "magic" of per-server setup scattered across plugins.
+--   • Neovim 0.11+ uses vim.lsp.config + vim.lsp.enable. This file centralizes that setup.
+--   • nvim-lspconfig ships the base config for each server (cmd, filetypes,
+--     root markers) in its lsp/<name>.lua files. We only layer our settings
+--     on top, so root detection stays in the format Neovim expects.
+--   • vim.lsp.enable() already starts servers by filetype; no autocmds needed.
+--   • Other servers Mason installs (bashls, jsonls, basedpyright, ruff, ...)
+--     are enabled by mason-lspconfig (see mason.lua).
+--
+-- Keys:
+--   • <leader>lh → toggle inlay hints for the current buffer
 --
 -- Quick checks:
---   • :LspInfo → “lua_ls” for Lua buffers
---   • :LspInfo → “vtsls” for TS/JS files
---   • :LspInfo → “vue_ls” for .vue files
+--   • :checkhealth vim.lsp (or :LspInfo) → “lua_ls” for Lua buffers
+--   • :checkhealth vim.lsp → “vtsls” for TS/JS files, “vtsls” + “vue_ls” for .vue
+--   • :lsp → interactively restart/stop clients (new in 0.12)
 -- ============================================================================
 
 local M = {
@@ -37,131 +44,73 @@ local M = {
     },
 
     config = function()
-      local util = require "lspconfig.util"
-
       ------------------------------------------------------------------------
-      -- Capabilities
-      -- Why: nvim-cmp augments LSP completion behavior. If cmp isn't available,
-      --      we still enable snippet support so servers can return rich items.
+      -- Capabilities (shared by every server via the "*" config)
+      -- Why: nvim-cmp augments LSP completion behavior. Neovim's defaults
+      --      already advertise snippet support, so no fallback is needed.
       ------------------------------------------------------------------------
-      local capabilities
       local ok_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       if ok_cmp then
-        capabilities = cmp_nvim_lsp.default_capabilities()
-      else
-        capabilities = vim.lsp.protocol.make_client_capabilities()
-        capabilities.textDocument.completion.completionItem.snippetSupport = true
+        vim.lsp.config("*", { capabilities = cmp_nvim_lsp.default_capabilities() })
       end
 
       ------------------------------------------------------------------------
-      -- Minimal on_attach
-      -- Why: inlay hints are useful but should only be turned on when supported
-      --      by the server and the Neovim API.
+      -- Inlay hints
+      -- Why: useful but should only be turned on when the server supports them.
+      --      LspAttach covers every server, including the ones Mason enables.
       ------------------------------------------------------------------------
-      local function on_attach(client, bufnr)
-        if client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-          pcall(vim.lsp.inlay_hint, bufnr, true)
-        end
-      end
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true }),
+        callback = function(ev)
+          local client = vim.lsp.get_client_by_id(ev.data.client_id)
+          if client and client:supports_method("textDocument/inlayHint", ev.buf) then
+            vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+          end
+        end,
+      })
+
+      vim.keymap.set("n", "<leader>lh", function()
+        local filter = { bufnr = 0 }
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter), filter)
+      end, { desc = "Toggle inlay hints" })
 
       ------------------------------------------------------------------------
       -- LUA_LS
       -- Why: your config is Lua, so this keeps diagnostics/hover/completion
       --      accurate for Neovim APIs. Overrides live in lspsettings.lua_ls.
       ------------------------------------------------------------------------
-      local settings = {}
-      local ok, lua_settings = pcall(require, "user.plugins.lspsettings.lua_ls")
-      if ok then settings = lua_settings end
-
-      local lua_cfg = vim.tbl_deep_extend("force", {
-        cmd = { "lua-language-server" },
-        filetypes = { "lua" },
-        root_dir = util.root_pattern(
-          ".luarc.json",
-          ".luarc.jsonc",
-          ".luacheckrc",
-          ".stylua.toml",
-          "stylua.toml",
-          "selene.toml",
-          "selene.yml",
-          ".git"
-        ),
-        single_file_support = true,
-        capabilities = capabilities,
-        on_attach = on_attach,
+      local ok_lua, lua_settings = pcall(require, "user.plugins.lspsettings.lua_ls")
+      vim.lsp.config("lua_ls", vim.tbl_deep_extend("force", {
         settings = {
           Lua = {
             workspace = { checkThirdParty = false },
             diagnostics = { globals = { "vim" } },
           },
         },
-      }, settings)
-
-      vim.lsp.config("lua_ls", lua_cfg)
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = lua_cfg.filetypes,
-        callback = function() vim.lsp.enable("lua_ls") end,
-      })
+      }, ok_lua and lua_settings or {}))
 
       ------------------------------------------------------------------------
       -- VTSLS (TypeScript / JavaScript / TSX / Vue)
-      -- Why: handles all TS/JS intelligence. vue_ls expects a TS client to be
-      --      active for script blocks inside .vue files, so vtsls must attach
-      --      to vue buffers too. filetypes live in lspsettings.vtsls.
+      -- Why: handles all TS/JS intelligence. vue_ls forwards TypeScript work in
+      --      .vue files to vtsls (through @vue/typescript-plugin), so vtsls must
+      --      attach to vue buffers too. filetypes/settings live in lspsettings.vtsls.
       ------------------------------------------------------------------------
       local ok_vts, vts = pcall(require, "user.plugins.lspsettings.vtsls")
-      local vts_cfg = {
-        cmd = { "vtsls" },
-        filetypes = ok_vts and vts.filetypes
-          or { "typescript", "typescriptreact", "javascript", "javascriptreact" },
-        root_dir = util.root_pattern("tsconfig.json", "jsconfig.json", "package.json", ".git"),
-        single_file_support = true,
-        capabilities = capabilities,
-        on_attach = on_attach,
-        settings = ok_vts and vts.settings or {},
-      }
-      vim.lsp.config("vtsls", vts_cfg)
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = vts_cfg.filetypes,
-        callback = function() vim.lsp.enable("vtsls") end,
-      })
+      if ok_vts then
+        vim.lsp.config("vtsls", { filetypes = vts.filetypes, settings = vts.settings })
+      end
 
       ------------------------------------------------------------------------
       -- VUE_LS (Volar) — Vue 3 SFCs + template intelligence
       -- Why: this powers .vue templates, directives, and SFC-specific features.
       --      It delegates TS/JS to vtsls, which is why both run together.
-      --      It prefers workspace TypeScript so versions match your project.
       ------------------------------------------------------------------------
       local ok_volar, vol = pcall(require, "user.plugins.lspsettings.volar")
-      local tsdk = ""
-      do
-        local ts_path = util.path.join(vim.loop.cwd() or "", "node_modules", "typescript", "lib")
-        if vim.loop.fs_stat(ts_path) then tsdk = ts_path end
-      end
-
-      local vue_cfg = {
-        cmd = { "vue-language-server", "--stdio" },
-        filetypes = { "vue" },
-        root_dir = util.root_pattern(
-          "pnpm-workspace.yaml",
-          "yarn.lock",
-          "package-lock.json",
-          "package.json",
-          ".git"
-        ),
-        single_file_support = true,
-        capabilities = capabilities,
-        on_attach = on_attach,
-        settings = ok_volar and vol.settings or {
-          vue = { format = { enable = true } },
-          typescript = { tsdk = tsdk },
-        },
-      }
-      vim.lsp.config("vue_ls", vue_cfg)
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = vue_cfg.filetypes,
-        callback = function() vim.lsp.enable("vue_ls") end,
+      vim.lsp.config("vue_ls", {
+        settings = ok_volar and vol.settings or { vue = { format = { enable = true } } },
       })
+
+      vim.lsp.enable { "lua_ls", "vtsls", "vue_ls" }
     end,
   },
 }

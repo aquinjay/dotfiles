@@ -23,6 +23,8 @@ function M.config()
     "lua_ls",
     "bashls",
     "jsonls",
+    "basedpyright", -- Python types (pyright fork)
+    "ruff", -- Python lint/format
   }
 
   -- mason.nvim handles installing and updating the external tooling. Modern versions expose
@@ -43,11 +45,14 @@ function M.config()
   }
 
   -- mason-lspconfig bridges mason.nvim with nvim-lspconfig. Ensuring the servers above are
-  -- installed keeps the tooling up-to-date, while `automatic_installation` makes any servers
-  -- configured elsewhere in your setup install themselves the first time they are needed.
+  -- installed keeps the tooling up-to-date. Since v2 it also calls vim.lsp.enable() for every
+  -- installed server (`automatic_enable`); the exclude list keeps installed-but-unwanted servers
+  -- quiet. pyright is excluded so it doesn't duplicate basedpyright's diagnostics.
   require("mason-lspconfig").setup {
     ensure_installed = servers,
-    automatic_installation = true,
+    automatic_enable = {
+      exclude = { "pyright" },
+    },
   }
 end
 
