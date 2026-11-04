@@ -5,7 +5,7 @@
 * {
     /* font-family is set per theme in colors.css */
     font-size: 14px;  /* Slightly smaller font size */
-    font-weight: 900;
+    /* Font weight follows the selected theme in colors.css. */
     margin: 0;
     padding: 0;
     transition-property: background-color;
@@ -89,6 +89,7 @@ window#waybar.hidden {
 #custom-hyprPicker,
 #custom-power-menu,
 #custom-notification,
+#custom-shortcuts,
 #custom-spotify,
 #custom-weather,
 #custom-weather.severe,
@@ -319,3 +320,32 @@ label:focus {
 #custom-notification {
     color: @primary;
 }
+
+/* Shortcut reference beside the system status modules. */
+#custom-shortcuts {
+    color: @primary;
+    padding: 6px 9px;
+}
+
+#custom-shortcuts:hover {
+    background-color: @surface_container_high;
+}
+
+/* Readable hover cards using the current theme palette, font and shape. */
+tooltip {
+    background-color: @surface_container;
+    color: @on_surface;
+    border: 1px solid @outline;
+}
+
+tooltip label {
+    color: @on_surface;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 12px 16px;
+    margin: 0;
+}
+
+/* Status colors follow the selected theme. */
+#wireplumber { color: @tertiary; }
+#custom-storage { color: @on_surface_variant; }

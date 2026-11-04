@@ -30,3 +30,6 @@ blue    = "{{colors.on_blue_container.default.hex}}"
 magenta = "{{colors.on_magenta_container.default.hex}}"
 cyan    = "{{colors.on_cyan_container.default.hex}}"
 white   = "{{colors.on_surface.default.hex}}"
+
+[window]
+opacity = {{style.terminal_opacity}}

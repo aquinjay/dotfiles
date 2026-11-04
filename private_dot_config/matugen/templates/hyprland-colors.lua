@@ -10,6 +10,10 @@ return {
   secondary_container = "rgba({{colors.secondary_container.default.hex_stripped}}ff)",
   on_primary      = "rgba({{colors.on_primary.default.hex_stripped}}ff)",
   shadow          = "rgba({{colors.shadow.default.hex_stripped}}aa)",
+  gaps_in = {{style.gaps_in}},
+  gaps_out = {{style.gaps_out}},
+  inactive_opacity = {{style.inactive_opacity}},
+  border_animation = {{style.border_animation}},
   -- style (from the preset, or ~/.config/matugen/style-wallpaper.json)
   glow            = "{{style.glow}}",
   rounding        = {{style.rounding}},

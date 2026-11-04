@@ -31,6 +31,7 @@
         //"custom/gammastep"
     ],
     "modules-right": [
+        "custom/shortcuts",
         "backlight",
         "custom/storage",
         "memory",
@@ -48,6 +49,13 @@
     // -------------------------------------------------------------------------
     // Modules
     // -------------------------------------------------------------------------
+
+    "custom/shortcuts": {
+        "format": "",
+        "tooltip": true,
+        "tooltip-format": "<span weight=\"normal\"><b>Hyprland shortcuts</b> · SUPER = Windows key\n\n<b>Apps &amp; tools</b>\nSUPER + Enter / Space     Terminal / app launcher\nSUPER + E / Shift + E     Files / terminal file manager\nAlt + Tab                 Switch apps\nSUPER + Shift + V         Clipboard history\nSUPER + Shift + Space     Emoji picker\n\n<b>Windows</b>\nSUPER + Q / F / V         Close / fullscreen / float\nSUPER + H J K L / arrows  Focus left / down / up / right\n  + Shift                 Move window instead\nSUPER + R                 Resize with arrows or H J K L; Esc exits\nSUPER + mouse drag        Left: move · Right: resize\nSUPER + W / Tab           Toggle group / next grouped window\n\n<b>Workspaces</b>\nSUPER + 1–9 / 0           Switch to workspace 1–9 / 10\n  + Shift / Ctrl          Move window / move and follow\nSUPER + comma / period   Previous / next workspace\nSUPER + F1 / minus        Toggle scratchpad / move to special\nSUPER + equal             Toggle special workspace\n\n<b>Screenshots &amp; desktop</b>\nPrint / Ctrl + Print      Capture region / active window\nAlt + Print               Capture screen\nSUPER + Shift + S         Capture and annotate\nSUPER + Shift + T / W     Theme menu / wallpaper picker\nSUPER + N / Shift + N     Notifications / do not disturb\nSUPER + Esc / B           Lock screen / toggle top bar\n\n<i>Click the keyboard icon for the full guide. Press Q to close it.</i></span>",
+        "on-click": "alacritty --title \"Hyprland shortcuts\" -e less ~/.config/hypr/README-WORKFLOW.md"
+    },
 
     "custom/sp1": {
         "format": " | ",
@@ -253,11 +261,11 @@
             "weeks-pos": "left",
             "on-scroll": 1,
             "format": {
-                "months":   "<span color='#c8d2e0'><b>{}</b></span>",
-                "weekdays": "<span color='#00aa84'><b>{}</b></span>",
-                "weeks":    "<span color='#798bb2'>W{}</span>",
-                "days":     "<span color='#c8d2e0'>{}</span>",
-                "today":    "<span background='#025939' color='#ffffff'><b>{}</b></span>"
+                "months":   "<b>{}</b>",
+                "weekdays": "<b>{}</b>",
+                "weeks":    "W{}",
+                "days":     "{}",
+                "today":    "<b><u>{}</u></b>"
             }
         },
         "actions": {
@@ -296,7 +304,7 @@
     "cpu": {
         "interval": 1,
         //"format": " {}%", // Icon: microchip
-        "format": "{max_frequency}GHz <span color=\"darkgray\">| {usage}%</span>",
+        "format": "{max_frequency}GHz | {usage}%",
         "max-length": 13,
         "min-length": 13
     },

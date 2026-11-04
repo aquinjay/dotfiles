@@ -14,17 +14,23 @@
 
 /* Font and shape come from the theme style, so presets can be angular. */
 * {
+    font-weight: {{style.ui_weight}};
     font-family: "{{style.font}}", "FantasqueSansM Nerd Font", "Font Awesome 6 Free", sans-serif;
 }
 
 #workspaces, #window, #clock, #battery, #cpu, #memory, #disk, #temperature, #backlight,
 #network, #pulseaudio, #wireplumber, #custom-media, #mode, #idle_inhibitor, #mpd,
 #bluetooth, #custom-spotify, #custom-weather, #custom-screenshot_t, #tray,
-#custom-power, #custom-storage, #custom-notification {
+#custom-power, #custom-storage, #custom-notification, #custom-shortcuts {
     border-radius: {{style.radius_lg}}px;
     border: {{style.module_border}};
 }
 
 #workspaces button {
+    border-radius: {{style.radius}}px;
+}
+
+/* Hover cards follow each theme’s rounded or angular shape. */
+tooltip {
     border-radius: {{style.radius}}px;
 }

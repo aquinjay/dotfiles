@@ -79,8 +79,8 @@ end)
 -- General config
 hl.config({
   general = {
-    gaps_in = 3,
-    gaps_out = 5,
+    gaps_in = theme.gaps_in or 3,
+    gaps_out = theme.gaps_out or 5,
     border_size = theme.border_size or 3,
     col = {
       active_border = { colors = { theme.primary, theme.tertiary }, angle = 45 },
@@ -94,7 +94,7 @@ hl.config({
 
   decoration = {
     active_opacity = 1,
-    inactive_opacity = 0.95,
+    inactive_opacity = theme.inactive_opacity or 0.95,
     -- Full-screen shader (the Fallout preset uses a CRT effect); empty = off
     screen_shader = theme.screen_shader or "",
     rounding = theme.rounding or 8,
@@ -162,13 +162,11 @@ hl.config({
   },
 
   dwindle = {
-    special_scale_factor = 0.8,
     preserve_split = true,
   },
 
   master = {
     new_status = "master",
-    special_scale_factor = 0.8,
   },
 
   binds = {
@@ -191,7 +189,7 @@ hl.animation({ leaf = "windowsOut", enabled = true, speed = 5, bezier = "default
 hl.animation({ leaf = "border", enabled = true, speed = 5, bezier = "default" })
 -- Slowly rotate the active border gradient
 hl.curve("linear", { type = "bezier", points = { { 0, 0 }, { 1, 1 } } })
-hl.animation({ leaf = "borderangle", enabled = true, speed = 60, bezier = "linear", style = "loop" })
+hl.animation({ leaf = "borderangle", enabled = theme.border_animation ~= false, speed = 60, bezier = "linear", style = "loop" })
 hl.animation({ leaf = "workspacesIn", enabled = true, speed = 6, bezier = "overshot", style = "slide" })
 hl.animation({ leaf = "workspacesOut", enabled = true, speed = 6, bezier = "overshot", style = "slidefade 80%" })
 
@@ -271,7 +269,7 @@ bind(mainMod .. " + W", hl.dsp.group.toggle()) -- was SUPER+K (now vim focus)
 bind(mainMod .. " + Tab", hl.dsp.group.next())
 
 -- Toggle gaps
-exec(mainMod .. " + SHIFT + G", [[hyprctl --batch "keyword general:gaps_out 5;keyword general:gaps_in 3"]])
+exec(mainMod .. " + SHIFT + G", string.format([[hyprctl --batch "keyword general:gaps_out %d;keyword general:gaps_in %d"]], theme.gaps_out or 5, theme.gaps_in or 3))
 exec(mainMod .. " + G", [[hyprctl --batch "keyword general:gaps_out 0;keyword general:gaps_in 0"]])
 
 -- Volume control

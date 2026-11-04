@@ -12,7 +12,13 @@
     "shadow_range": 22,
     "screen_shader": "",
     "module_border": "1px solid alpha(@primary, 0.45)",
-    "terminal": "alacritty"
+    "terminal": "alacritty",
+    "gaps_in": 3,
+    "gaps_out": 5,
+    "inactive_opacity": 0.95,
+    "border_animation": true,
+    "terminal_opacity": 0.8,
+    "ui_weight": 900
   },
   "colors": {
     "primary": "#ff1f3d",

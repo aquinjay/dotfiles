@@ -691,7 +691,7 @@ Config: `~/.config/swaync/config.json`.
 
 | Keybind | Action |
 |---|---|
-| `SUPER + Shift + T` | Theme menu: **Wallpaper colors**, **Deus Ex**, **Samurai**, **Fallout Terminal** |
+| `SUPER + Shift + T` | Theme menu: **Wallpaper colors**, **Deus Ex**, **Samurai**, **Fallout Terminal**, **Axiom — Xenobiology** |
 | `SUPER + Shift + W` | Pick a wallpaper and generate colors from it (switches to wallpaper colors) |
 
 - **Wallpaper colors**: soft, rounded look; colors come from the wallpaper. Choosing it from the
@@ -767,3 +767,24 @@ Handled by `hypridle` (settings in `hypridle.conf`, lock screen in `hyprlock.con
 
 This config is Lua (`hyprland.lua`), so `hyprctl dispatch` commands use Lua syntax, e.g.
 `hyprctl dispatch 'hl.dsp.dpms({ action = "off" })'` — not the `dispatch dpms off` form most guides show.
+
+
+## Axiom — Xenobiology
+
+Choose **Axiom — Xenobiology** with `SUPER + Shift + T`, or run:
+
+```sh
+~/.config/hypr/scripts/theme.sh preset axiom
+```
+
+A calm scientific workspace: graphite surfaces, mineral ivory text, sea-glass accents,
+and muted brass. Fira Sans gives the interface a clean architectural feel. Wider gaps,
+steady window borders, and a nearly opaque terminal keep research and reading clear.
+The wallpaper is an abstract mathematical surface with fine sea-glass and champagne contour lines on graphite.
+
+The preset lives in `~/.config/matugen/presets/axiom.json`; the wallpaper is
+`~/Pictures/Wallpapers/themes/axiom-manifold.png`. Its generation prompt is saved alongside it
+as `axiom-manifold-prompt.txt`. The wallpaper was generated with the built-in image generation tool.
+Switching presets restores that preset's gaps, border animation, font weight and opacity.
+`SUPER + Shift + G` restores the selected theme's spacing after gaps have been disabled.
+To return to the previous wallpaper theme, choose **Wallpaper colors** in the theme menu.

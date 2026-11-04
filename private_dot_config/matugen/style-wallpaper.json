@@ -9,5 +9,11 @@
   "shadow_range": 14,
   "module_border": "none",
   "screen_shader": "",
-  "terminal": "alacritty"
+  "terminal": "alacritty",
+  "gaps_in": 3,
+  "gaps_out": 5,
+  "inactive_opacity": 0.95,
+  "border_animation": true,
+  "terminal_opacity": 0.8,
+  "ui_weight": 900
 }
