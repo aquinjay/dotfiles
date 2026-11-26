@@ -47,6 +47,7 @@ Open with `<leader>oe` or reveal current file with `<leader>of`.
 | Help docs | `<leader>fh` | Search help tags |
 | Resume picker | `<leader>fl` | Last Telescope picker |
 | Recent files | `<leader>fr` | Recently opened files |
+| Chezmoi dotfiles | `<leader>fc` | Pick any chezmoi-managed file |
 | Git branches | `<leader>fgb` | Checkout branch picker |
 | Buffers | `<leader>bb` | Open/delete buffers |
 
@@ -69,8 +70,7 @@ Inside Telescope:
 | Move up window | `<C-k>` or `<M-k>` |  |
 | Move right window | `<C-l>` or `<M-l>` |  |
 | Vertical split | `<leader>v` | Creates vsplit |
-| Next buffer | `<S-l>` | Buffer next |
-| Previous buffer | `<S-h>` | Buffer previous |
+| Next / previous buffer | `]b` / `[b` | Built-in (0.11+) |
 | Alternate buffer | `<M-Tab>` | Same as `<C-6>` |
 | New empty tab | `<leader>an` | Opens new tab |
 | Open current file in new tab | `<leader>aN` | Tab from current file |
@@ -79,6 +79,7 @@ Inside Telescope:
 | Move tab right | `<leader>al` |  |
 | Terminal tab | `<leader>;` | Opens terminal in new tab |
 | CD to current file directory | `<leader>pd` | Sets cwd to current buffer dir |
+| Chezmoi re-add current file | `<leader>pc` | Syncs current live file back to chezmoi |
 
 ## Editing and movement
 
@@ -119,16 +120,168 @@ Inside Telescope:
 | Shrink syntax selection | `<BS>` or `in` | visual |
 | Select next / previous node | `]n` / `[n` | visual |
 | Extend selection to next / previous node | `]N` / `[N` | visual |
+| Select outer / inner function | `af` / `if` | visual / operator |
+| Select outer / inner class | `ac` / `ic` | visual / operator |
+| Select outer / inner argument | `aa` / `ia` | visual / operator |
+| Next / prev function start | `]m` / `[m` | normal / visual / operator |
+| Next / prev function end | `]M` / `[M` | normal / visual / operator |
+| Next / prev class start | `]]` / `[[` | normal / visual / operator |
 | Update parsers | `:TSUpdate` | command |
 
 `an`, `in`, `]n`, `[n`, `]N` and `[N` are built into Neovim 0.12 (`:h treesitter-incremental-selection`). The old `<S-CR>` "grow to scope" has no built-in equivalent and was dropped.
 
 ## LSP
 
-| Goal | Key / Command | Mode |
+| Goal | Key / Command | Mode | Notes |
+|---|---:|---:|---|
+| Go to definition | `gd` | normal | Buffer-local on LSP attach |
+| Go to declaration | `gD` | normal | Useful for C/C++ headers |
+| Go to implementation | `gI` or `gri` | normal | `gri` is built-in (0.11+) |
+| Hover docs | `K` | normal | Built-in; rounded border |
+| References | `grr` | normal | Built-in |
+| Type definition | `grt` | normal | Built-in |
+| Line diagnostics float | `gl` | normal | Also opens on `[d`/`]d` jump |
+| Next / prev diagnostic | `<leader>lj` / `<leader>lk` or `]d` / `[d` | normal | Opens diagnostic float |
+| Code action | `<leader>la` or `gra` | normal / visual | Uses Telescope UI-Select |
+| Rename symbol | `<leader>lr` or `grn` | normal |  |
+| Format buffer / selection | `<leader>lf` | normal / visual | `conform.nvim` (manual only; no format-on-save) |
+| Run linter | `<leader>lL` | normal | `nvim-lint` (`fish -n`) |
+| Switch C/C++ source / header | `<leader>lc` | normal | Buffer-local when `clangd` attaches |
+| Select Python virtual env | `<leader>lv` | normal | Python buffers (`venv-selector.nvim`) |
+| Run CodeLens | `<leader>ll` or `grx` | normal |  |
+| Document / workspace symbols | `<leader>ls` / `<leader>lS` | normal | Telescope pickers (`gO` built-in) |
+| Diagnostics to loclist | `<leader>lq` | normal |  |
+| LSP info / health | `<leader>li` | normal | `:checkhealth vim.lsp` |
+| Toggle inlay hints | `<leader>lh` | normal | Per buffer |
+| Toggle diagnostic virtual text | `<leader>ld` | normal | Global toggle (off by default) |
+| Manage clients (restart/stop) | `:lsp` | command | Built-in (0.12) |
+
+## Diagnostics & Lists (Trouble)
+
+| Goal | Key | Notes |
 |---|---:|---|
-| Toggle inlay hints | `<leader>lh` | normal |
-| Manage clients (restart/stop) | `:lsp` | command |
+| Workspace diagnostics | `<leader>xx` | Toggle Trouble drawer |
+| Buffer diagnostics | `<leader>xX` | Current buffer only |
+| Document symbols | `<leader>xs` | Side panel |
+| LSP defs / refs | `<leader>xl` | Right panel |
+| Location list | `<leader>xL` | Toggle Trouble loclist |
+| Quickfix list | `<leader>xq` | Toggle Trouble quickfix |
+
+## Git (Gitsigns & Diffview)
+
+| Goal | Key | Mode | Notes |
+|---|---:|---:|---|
+| Next / previous hunk | `]c` / `[c` | normal | Preserves default diff nav in diff mode |
+| Preview hunk | `<leader>gp` | normal | Rounded floating preview |
+| Stage hunk | `<leader>gs` | normal / visual | Stage hunk or visual lines |
+| Reset hunk | `<leader>gr` | normal / visual | Revert unwanted edits hunk-by-hunk |
+| Stage / reset buffer | `<leader>gS` / `<leader>gR` | normal | Whole file |
+| Blame line | `<leader>gb` | normal | Full commit blame popup |
+| Toggle inline blame | `<leader>gB` | normal | Virtual text blame |
+| Diff current file | `<leader>gD` | normal | Gitsigns split diff |
+| Repo diff view | `<leader>gd` | normal | `:DiffviewOpen` multi-file review |
+| File / repo git history | `<leader>gh` / `<leader>gH` | normal | `:DiffviewFileHistory` |
+| Close diff view | `<leader>gx` | normal | `:DiffviewClose` |
+| Select git hunk text object | `ih` | operator / visual | e.g. `dih`, `vih` |
+
+## Agent & CodeCompanion (`agy`)
+
+Buffers modified on disk by external agents automatically reload (`autoread` + `checktime`). See [WORKFLOWS.md](./WORKFLOWS.md) for full end-to-end guides.
+
+| Goal | Key | Mode | Notes |
+|---|---:|---:|---|
+| Toggle `agy` split terminal | `<M-a>` or `<leader>ca` | normal / terminal (`<M-a>`) | Persistent right split (`q` hides in Normal mode; `/exit` auto-closes) |
+| Toggle `agy --continue` | `<leader>cC` | normal | Resume last CLI session |
+| Send `@file:line` / range to `agy` | `<leader>cp` | normal / visual | Inserts reference into `agy` terminal |
+| Toggle CodeCompanion chat | `<leader>cc` | normal / visual | Native buffer backed by `agy acp` |
+| CodeCompanion actions | `<leader>cA` | normal / visual | Action palette |
+| CodeCompanion inline prompt | `<leader>ci` | normal / visual | In-buffer edit/prompt |
+| Add selection to chat | `<leader>cx` | visual | Sends visual range to CodeCompanion |
+| Copy `@file:L<line>` / range | `<leader>cy` | normal / visual | Copies to `+` clipboard |
+| Copy fenced snippet + `@file:lines` | `<leader>cs` | visual | Includes filetype code fence |
+| Copy `@file` path | `<leader>cf` | normal | Relative to cwd |
+| Copy buffer diagnostics | `<leader>cd` | normal | Formatted list for pasting to `agy` |
+| Copy workspace diagnostics | `<leader>cD` | normal | All loaded buffers, grouped by file |
+
+## Debugging (`nvim-dap` + `nvim-dap-view`)
+
+Python uses Mason `debugpy`; C/C++ uses native system `gdb --interpreter=dap`.
+
+| Goal | Key | Mode | Notes |
+|---|---:|---:|---|
+| Toggle breakpoint | `<leader>db` | normal |  |
+| Conditional breakpoint | `<leader>dB` | normal | Prompts for condition |
+| Start / continue | `<leader>dc` or `<F5>` | normal | Auto-opens `dap-view` |
+| Step over | `<leader>do` or `<F10>` | normal |  |
+| Step into | `<leader>di` or `<F11>` | normal |  |
+| Step out | `<leader>dO` or `<F12>` | normal |  |
+| Run to cursor | `<leader>dC` | normal |  |
+| Terminate session | `<leader>dt` | normal | Auto-closes `dap-view` |
+| Run last debug config | `<leader>dl` | normal |  |
+| Toggle DAP view | `<leader>du` | normal | Scopes, watches, breakpoints, threads, REPL, console |
+| Watch expression | `<leader>dw` | normal / visual | Adds symbol/selection to watches |
+| Toggle DAP REPL | `<leader>dr` | normal |  |
+
+## Testing (`neotest`)
+
+Supports Python (`pytest`) and C++ GoogleTest (`:ConfigureGtest` once per C++ project).
+
+| Goal | Key | Notes |
+|---|---:|---|
+| Run nearest test | `<leader>tt` | Under cursor |
+| Run test file | `<leader>tf` | Current file |
+| Run all tests | `<leader>ta` | Whole workspace |
+| Debug nearest test | `<leader>td` | Launches under `nvim-dap` |
+| Toggle test summary | `<leader>ts` | Side tree view |
+| Show test output float | `<leader>to` | Enters float; auto-closes |
+| Toggle test output panel | `<leader>tO` | Persistent bottom panel |
+| Stop running tests | `<leader>tS` |  |
+| Toggle watch mode | `<leader>tw` | Re-runs current file on save |
+| Next / prev failed test | `]t` / `[t` |  |
+
+## CMake / Build (`cmake-tools.nvim`)
+
+Auto-loads when `CMakeLists.txt` is in cwd and symlinks `compile_commands.json` to project root.
+
+| Goal | Key | Notes |
+|---|---:|---|
+| Generate CMake | `<leader>mg` | Exports + symlinks `compile_commands.json` |
+| Build target | `<leader>mb` |  |
+| Run launch target | `<leader>mr` |  |
+| Debug target (GDB DAP) | `<leader>md` | Launches inside `nvim-dap` |
+| Select build target | `<leader>mt` |  |
+| Select launch target | `<leader>ml` |  |
+| Select build type | `<leader>mT` | Debug / Release / etc. |
+| Clean build | `<leader>mc` |  |
+
+## Notes: Obsidian vaults
+
+`obsidian.nvim` handles the vaults (Thinking, Consulting); `render-markdown.nvim` draws the formatting.
+The `<leader>n` keys work from anywhere; the in-note keys work inside vault notes.
+
+| Goal | Key | Notes |
+|---|---:|---|
+| Find note by name | `<leader>nf` | Picker (Telescope) |
+| Search note text | `<leader>ns` | ripgrep across the vault |
+| Browse tags | `<leader>nt` |  |
+| Today's daily note | `<leader>nd` | Uses Daily Template |
+| List daily notes | `<leader>nD` |  |
+| New note | `<leader>nn` | Lands in `+ Encounters` |
+| New note from template | `<leader>nN` | Pick from `Extras/Templates` |
+| Switch vault | `<leader>nw` | Thinking ↔ Consulting |
+| **Open current note in Obsidian app** | `<leader>no` | App live-reloads on every save — shows images, Datacore, Excalidraw |
+| Backlinks | `<leader>nb` | Or `grr` |
+| Links in this note | `<leader>nl` |  |
+| Table of contents | `<leader>nc` |  |
+| Insert template | `<leader>ni` |  |
+| Rename note + update links | `<leader>nr` | Or `grn`; then `:wa` |
+| Paste image from clipboard | `<leader>np` | Saves to `Extras/` |
+| Toggle rendered / raw markdown | `<leader>nm` | Any markdown file |
+| Follow link / toggle checkbox / fold heading | `<CR>` | In vault notes (replaces syntax selection there) |
+| Next / previous link | `]o` / `[o` | In vault notes |
+| Go to linked note | `gd` | In vault notes |
+| Complete `[[note]]`, `[[##heading]]`, `#tag`, `> [!callout` | type it | Completion menu |
+| Fold / unfold section | `za` / `zc` / `zo` | `zM` close all, `zR` open all |
 
 ## Illuminated references
 

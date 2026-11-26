@@ -52,10 +52,7 @@ keymap('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 keymap("n", "<RightMouse>", "<cmd>:popup mousemenu<CR>")
 keymap("n", "<Tab>", "<cmd>:popup mousemenu<CR>")
--- Navigate buffers
--- S = Shift
-keymap("n", "<S-l>", ":bnext<CR>", opts)
-keymap("n", "<S-h>", ":bprevious<CR>", opts)
+-- Note: use Neovim 0.11+ built-in [b / ]b to cycle buffers (<S-h>/<S-l> jump to line ends below).
 
 ------------
 -- Insert --

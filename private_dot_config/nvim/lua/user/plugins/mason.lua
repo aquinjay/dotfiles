@@ -1,35 +1,32 @@
---[[
-  mason.nvim is a Neovim plugin that allows you to easily manage external editor tooling such as
-  LSP servers, DAP servers, linters, and formatters through a single interface. Mason is basically
-  the menu you see when a plugin gets installed now.
+-- lua/user/plugins/mason.lua
+-- Manages external LSP servers (mason-lspconfig v2) and CLI linters/formatters
+-- (mason-tool-installer).
+--
+-- Notes:
+--   • mason-lspconfig v2 automatically calls vim.lsp.enable() for every installed
+--     server except those listed in `automatic_enable.exclude`.
+--   • C/C++ uses the system /usr/bin/clangd (configured in lspconfig.lua) so it
+--     matches the system compiler and standard library headers.
 
-  mason-lspconfig.nvim closes the gap between mason.nvim and lspconfig. Its main responsibilities are to:
-    * register a setup hook with lspconfig that ensures servers installed with mason.nvim are configured
-    * provide extra convenience APIs such as the :LspInstall command
-    * allow you to (i) automatically install, and (ii) automatically set up a predefined list of servers
-    * translate between lspconfig server names and mason.nvim package names (e.g. lua_ls <-> lua-language-server)
-]]
 local M = {
   "williamboman/mason-lspconfig.nvim",
   dependencies = {
     "williamboman/mason.nvim",
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
   },
 }
 
 function M.config()
-  -- Define the language servers that should always be available. These names correspond to
-  -- the identifiers used by `nvim-lspconfig`.
   local servers = {
     "lua_ls",
     "bashls",
     "jsonls",
     "basedpyright", -- Python types (pyright fork)
-    "ruff", -- Python lint/format
+    "ruff",         -- Python lint/format
+    "fish_lsp",     -- Fish shell intelligence
+    "neocmakelsp",  -- CMake language server
   }
 
-  -- mason.nvim handles installing and updating the external tooling. Modern versions expose
-  -- additional quality-of-life options such as upgrading `pip` automatically and customizing
-  -- the UI icons, so we take advantage of them here.
   require("mason").setup {
     ui = {
       border = "rounded",
@@ -44,15 +41,23 @@ function M.config()
     },
   }
 
-  -- mason-lspconfig bridges mason.nvim with nvim-lspconfig. Ensuring the servers above are
-  -- installed keeps the tooling up-to-date. Since v2 it also calls vim.lsp.enable() for every
-  -- installed server (`automatic_enable`); the exclude list keeps installed-but-unwanted servers
-  -- quiet. pyright is excluded so it doesn't duplicate basedpyright's diagnostics.
   require("mason-lspconfig").setup {
     ensure_installed = servers,
     automatic_enable = {
+      -- pyright is excluded so it doesn't duplicate basedpyright diagnostics.
       exclude = { "pyright" },
     },
+  }
+
+  require("mason-tool-installer").setup {
+    ensure_installed = {
+      "shellcheck", -- Used by bashls for inline shell diagnostics
+      "shfmt",      -- Bash/sh formatter (conform.nvim)
+      "stylua",     -- Lua formatter (conform.nvim)
+      "debugpy",    -- Python DAP debugger (nvim-dap-python)
+    },
+    auto_update = false,
+    run_on_start = true,
   }
 end
 

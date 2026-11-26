@@ -13,11 +13,13 @@ local options = {
 	swapfile = false, -- creates a swapfile
 	-- undodir = undodir, -- Set an undo directory
 	undofile = true, -- enable persistent undo
+	autoread = true, -- automatically reload files modified externally (e.g. by agy)
 	writebackup = false, -- if a file is being edited by another program (or was written to file while editing with another program), it is not allowed to be edited
 
 	-----------------
 	--- Neovim UI ---
 	-----------------
+	winborder = "rounded", -- default border for floating windows (hover, signature, diagnostics)
 	number = true, -- Show row line number
 	showmatch = true, -- Highlight matching parenthesis
 	foldmethod = "manual", -- Folding, set to "expr" for treesitter based folding

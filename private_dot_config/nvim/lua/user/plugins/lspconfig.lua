@@ -18,8 +18,18 @@
 --   • Other servers Mason installs (bashls, jsonls, basedpyright, ruff, ...)
 --     are enabled by mason-lspconfig (see mason.lua).
 --
--- Keys:
---   • <leader>lh → toggle inlay hints for the current buffer
+-- Keys (set on LspAttach unless noted):
+--   • gd / gD / gI → definition / declaration / implementation
+--   • gl           → line diagnostic float
+--   • <leader>la   → code action (n/v)
+--   • <leader>lr   → rename symbol
+--   • <leader>lf   → format buffer
+--   • <leader>lh   → toggle inlay hints (global)
+--   • <leader>ld   → toggle inline diagnostic virtual text (global)
+--   • <leader>lj/k → next / prev diagnostic (or built-in ]d / [d)
+--   • <leader>ls/S → document / workspace symbols (Telescope)
+--   • <leader>li   → :checkhealth vim.lsp
+--   • Built-ins    → K (hover), grn, gra, grr, gri, grt, grx, gO, [d/]d
 --
 -- Quick checks:
 --   • :checkhealth vim.lsp (or :LspInfo) → “lua_ls” for Lua buffers
@@ -45,6 +55,47 @@ local M = {
 
     config = function()
       ------------------------------------------------------------------------
+      -- Diagnostics UI (Neovim 0.12 native API)
+      ------------------------------------------------------------------------
+      local ok_icons, icons = pcall(require, "user.core.icons")
+      local diag_icons = (ok_icons and icons.diagnostics) or {
+        Error = "",
+        Warning = "",
+        Hint = "󰌶",
+        Information = "",
+      }
+
+      vim.diagnostic.config {
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = diag_icons.Error,
+            [vim.diagnostic.severity.WARN] = diag_icons.Warning,
+            [vim.diagnostic.severity.HINT] = diag_icons.Hint,
+            [vim.diagnostic.severity.INFO] = diag_icons.Information,
+          },
+        },
+        virtual_text = false,
+        update_in_insert = false,
+        underline = true,
+        severity_sort = true,
+        jump = {
+          on_jump = function(diagnostic, bufnr)
+            if diagnostic then
+              vim.diagnostic.open_float { bufnr = bufnr, scope = "cursor", focus = false }
+            end
+          end,
+        },
+        float = {
+          focusable = true,
+          style = "minimal",
+          border = "rounded",
+          source = "if_many",
+          header = "",
+          prefix = "",
+        },
+      }
+
+      ------------------------------------------------------------------------
       -- Capabilities (shared by every server via the "*" config)
       -- Why: nvim-cmp augments LSP completion behavior. Neovim's defaults
       --      already advertise snippet support, so no fallback is needed.
@@ -55,16 +106,52 @@ local M = {
       end
 
       ------------------------------------------------------------------------
-      -- Inlay hints
-      -- Why: useful but should only be turned on when the server supports them.
-      --      LspAttach covers every server, including the ones Mason enables.
+      -- LspAttach: inlay hints + buffer-local LSP keymaps
+      -- Covers every server, including servers enabled by mason-lspconfig.
       ------------------------------------------------------------------------
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true }),
         callback = function(ev)
           local client = vim.lsp.get_client_by_id(ev.data.client_id)
-          if client and client:supports_method("textDocument/inlayHint", ev.buf) then
-            vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+          if client then
+            if client:supports_method("textDocument/inlayHint", ev.buf) then
+              vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
+            end
+            -- Let basedpyright own hover docs in Python buffers.
+            if client.name == "ruff" then
+              client.server_capabilities.hoverProvider = false
+            end
+          end
+
+          local function map(mode, lhs, rhs, desc)
+            vim.keymap.set(mode, lhs, rhs, { buffer = ev.buf, silent = true, desc = desc })
+          end
+
+          map("n", "gd", vim.lsp.buf.definition, "Go to definition")
+          map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
+          map("n", "gI", vim.lsp.buf.implementation, "Go to implementation")
+          map("n", "gl", vim.diagnostic.open_float, "Line diagnostics")
+
+          map({ "n", "x" }, "<leader>la", vim.lsp.buf.code_action, "Code action")
+          map("n", "<leader>lr", vim.lsp.buf.rename, "Rename symbol")
+          map("n", "<leader>ll", vim.lsp.codelens.run, "Run CodeLens")
+          map("n", "<leader>li", "<cmd>checkhealth vim.lsp<CR>", "LSP info")
+          map("n", "<leader>lq", vim.diagnostic.setloclist, "Diagnostics to loclist")
+          map("n", "<leader>lj", function()
+            vim.diagnostic.jump { count = 1 }
+          end, "Next diagnostic")
+          map("n", "<leader>lk", function()
+            vim.diagnostic.jump { count = -1 }
+          end, "Previous diagnostic")
+          map("n", "<leader>ls", function()
+            require("telescope.builtin").lsp_document_symbols()
+          end, "Document symbols")
+          map("n", "<leader>lS", function()
+            require("telescope.builtin").lsp_dynamic_workspace_symbols()
+          end, "Workspace symbols")
+
+          if client and client.name == "clangd" then
+            map("n", "<leader>lc", "<cmd>LspClangdSwitchSourceHeader<CR>", "Switch C/C++ source/header")
           end
         end,
       })
@@ -73,6 +160,12 @@ local M = {
         local filter = { bufnr = 0 }
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter), filter)
       end, { desc = "Toggle inlay hints" })
+
+      vim.keymap.set("n", "<leader>ld", function()
+        local current = vim.diagnostic.config().virtual_text
+        vim.diagnostic.config { virtual_text = not current }
+        vim.notify(("Diagnostic virtual text: %s"):format(current and "off" or "on"))
+      end, { desc = "Toggle diagnostic virtual text" })
 
       ------------------------------------------------------------------------
       -- LUA_LS
@@ -110,7 +203,28 @@ local M = {
         settings = ok_volar and vol.settings or { vue = { format = { enable = true } } },
       })
 
-      vim.lsp.enable { "lua_ls", "vtsls", "vue_ls" }
+      ------------------------------------------------------------------------
+      -- PYTHON: basedpyright + ruff (enabled by mason-lspconfig)
+      ------------------------------------------------------------------------
+      local ok_bp, bp = pcall(require, "user.plugins.lspsettings.basedpyright")
+      if ok_bp then
+        vim.lsp.config("basedpyright", bp)
+      end
+
+      local ok_ruff, ruff = pcall(require, "user.plugins.lspsettings.ruff")
+      if ok_ruff then
+        vim.lsp.config("ruff", ruff)
+      end
+
+      ------------------------------------------------------------------------
+      -- C / C++: system clangd
+      ------------------------------------------------------------------------
+      local ok_clangd, clangd = pcall(require, "user.plugins.lspsettings.clangd")
+      if ok_clangd then
+        vim.lsp.config("clangd", clangd)
+      end
+
+      vim.lsp.enable { "lua_ls", "vtsls", "vue_ls", "clangd" }
     end,
   },
 }

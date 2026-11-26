@@ -1,56 +1,51 @@
 # Neovim Configuration Overview
 
-This Neovim configuration is organized so that startup is predictable and each feature lives in its own module. The following sections explain how the files fit together and what to expect when using the setup.
+This Neovim configuration targets **NVIM v0.12.6** on Linux and is tracked with **chezmoi** (`private_dot_config/nvim`). Each concern lives in its own module so startup stays fast and predictable.
 
 ## Startup Flow
-- **`init.lua`** is the only file Neovim reads directly. It loads core options/keymaps, registers the plugin specs that should be installed, and finally runs the Lazy bootstrapper.
-- **`lua/user/core/lazy_helper.lua`** keeps a list of plugin imports. Each call to `lazy_helper.spec "user.plugins.some_plugin"` in `init.lua` tells Lazy.nvim to import the plugin definition stored in `lua/user/plugins/some_plugin.lua`.
-- **`lua/user/lazy_init.lua`** makes sure [`lazy.nvim`](https://github.com/folke/lazy.nvim) is installed, adds it to Neovim's runtime path, and hands the collected plugin specs to `require("lazy").setup`. The UI is configured to use rounded borders and will automatically install the `tokyonight` colorscheme if it is missing.
+- **`init.lua`** loads core modules (`lua/user/core/*`), registers every plugin spec via `lazy_helper.spec "user.plugins.<name>"`, and calls `require "user.lazy_init"`.
+- **`lua/user/core/lazy_helper.lua`** collects plugin imports handed to `lazy.nvim`.
+- **`lua/user/lazy_init.lua`** bootstraps [`lazy.nvim`](https://github.com/folke/lazy.nvim) with rounded UI borders and `tokyonight` fallback.
 
 ## Core Configuration
-- **`lua/user/core/options.lua`** sets fundamental editor options (indentation, search behavior, UI tweaks, etc.). Adjust this file for editor-wide behavior.
-- **`lua/user/core/keymaps.lua`** defines custom keybindings. Most keymaps are set directly through Lua for clarity and to avoid collision with plugin configs.
-- **`lua/user/core/colorscheme.lua`** applies the default theme. Because Lazy ensures `tokyonight.nvim` is present, this file simply sets the colorscheme after plugins are loaded.
+- **`lua/user/core/options.lua`** — editor options (`autoread`, `winborder = "rounded"`, `undofile`, indentation, search, UI).
+- **`lua/user/core/keymaps.lua`** — global navigation, editing, terminal, and yank-highlight mappings.
+- **`lua/user/core/agent.lua`** — external-change auto-reload (`checktime`), toggleable right-split `agy` terminal (`<leader>ca`/`<leader>cC`/`<leader>cp`), and one-keystroke context/diagnostics copy (`<leader>cy`/`<leader>cs`/`<leader>cd`/`<leader>cD`).
+- **`lua/user/core/icons.lua`** & **`lua/user/core/vaults.lua`** — shared Nerd Font icons and Obsidian vault paths.
 
-## Plugin Specs
-Each file in **`lua/user/plugins/`** returns a Lazy plugin specification table. Important examples include:
-- `colorscheme.lua` – installs and configures `folke/tokyonight.nvim`.
-- `cmp.lua` – configures autocompletion (`nvim-cmp`, `LuaSnip`, and related sources).
-- `lspconfig.lua` & `mason.lua` – integrate the LSP client with Mason for easy language-server installs. Mason handles server downloads, while `lspconfig.lua` wires the servers into Neovim when they are available.
-- `treesitter.lua` – enables syntax-aware highlighting and text objects.
-- `lualine.lua`, `devicons.lua`, `alpha.lua`, `indentline.lua`, `todo_comments.lua`, `hardtime.lua`, etc. – provide UI niceties, productivity helpers, and extra diagnostics.
-
-Some plugin specs (such as `whichkey.lua`, `telescope.lua`, `comment.lua`, and `none-ls.lua`) are present but not currently imported in `init.lua`. To enable them, uncomment the corresponding `lazy_helper.spec` line. The `old_lspconfig.lua` file is kept for reference but is not used.
-
-### What is still useful on Neovim 0.11?
-
-Neovim 0.11 has gained quality-of-life features (built-in inlay hints, `vim.lsp.enable`, `vim.snippet`, etc.), but the core of this configuration still relies on a few plugins for good reason:
-
-| Plugin | Why it is still relevant |
-| --- | --- |
-| `cmp.lua` | `nvim-cmp` mixes completion from LSP, buffer, snippets, filesystem paths, and even emoji in one menu, while handling custom keymaps and snippet jumps.【F:private_dot_config/nvim/init.lua†L10-L25】【F:private_dot_config/nvim/lua/user/plugins/cmp.lua†L1-L170】|
-| `lspconfig.lua` | `nvim-lspconfig` keeps per-server defaults and lets you expand beyond `lua_ls` when you are ready. The comment in `init.lua` notes it “may not be needed,” but removing it would mean managing every server by hand even with the new `vim.lsp.enable` helper.【F:private_dot_config/nvim/init.lua†L17-L18】【F:private_dot_config/nvim/lua/user/plugins/lspconfig.lua†L1-L22】|
-| `mason.lua` | Mason still saves you from manually downloading language servers; this spec auto-installs Lua, Python, Bash, and JSON servers with a UI that fits the rest of the setup.【F:private_dot_config/nvim/init.lua†L18】【F:private_dot_config/nvim/lua/user/plugins/mason.lua†L1-L34】|
-| `treesitter.lua` | Neovim does the highlighting, folding, and node selection itself (0.12), but only bundles a handful of parsers. The `nvim-treesitter` plugin (`main` branch) installs the rest of the parsers and their queries; `treesitter.lua` then switches the core features on per buffer.|
-| Comment toggling | Although the comment spec is disabled, Neovim still does not ship a `gc`/`gb` style toggler. If you want motion-based commenting, re-enabling `comment.lua` (and optionally `whichkey.lua`) remains the easiest route.【F:private_dot_config/nvim/init.lua†L16-L25】【F:private_dot_config/nvim/lua/user/plugins/comment.lua†L1-L31】|
-
-Everything else in `init.lua` is cosmetic or workflow sugar: feel free to disable `lualine`, `devicons`, `todo_comments`, `hardtime`, `nerdy`, `illuminate`, or `indentline` when you do not need them—they are not required for Neovim 0.11 itself.【F:private_dot_config/nvim/init.lua†L12-L24】
-
-## LSP, Treesitter, and Tooling
-- LSP servers are managed through Mason. Run `:Mason` inside Neovim to install language servers. `mason-lspconfig` enables every installed server automatically (minus the `exclude` list in `mason.lua`), and `lspconfig.lua` layers custom settings on top of nvim-lspconfig's defaults for `lua_ls`, `vtsls`, and `vue_ls`.
-- Treesitter parsers are installed and configured via the `treesitter.lua` spec, and missing ones auto-install when you open a file. Use `:TSInstall` to add languages by hand. Parser builds need `tree-sitter-cli` and a C compiler.
-- See `NVIM-0.12-NOTES.md` for what changed in the 0.12 upgrade and a backlog of possible rewrites.
-- Completion, snippets, autopairs, and editor hints work together: `nvim-cmp` surfaces results, `LuaSnip` provides snippet expansion, and other helper plugins polish the UX (e.g., `nvim-autopairs` for bracket pairing and `todo-comments.nvim` for TODO highlighting).
+## Plugin Highlights
+- **LSP, Formatting & Linting**:
+  - `lspconfig.lua` + `lspsettings/*` — native Neovim 0.12 `vim.lsp.config` / `vim.lsp.enable` for `lua_ls`, `vtsls`/`vue_ls`, `basedpyright` + `ruff`, `bashls`, `fish_lsp`, `neocmakelsp`, and system `/usr/bin/clangd`.
+  - `mason.lua` — `mason.nvim`, `mason-lspconfig` v2, and `mason-tool-installer.nvim` (`shellcheck`, `shfmt`, `stylua`).
+  - `conform.lua` & `lint.lua` — manual formatting (`<leader>lf`, format-on-save intentionally off) via `conform.nvim` (`ruff`, `shfmt`, `fish_indent`, `clang-format`, `stylua`, `biome`) and async linting via `nvim-lint` (`fish -n`).
+  - `venv_selector.lua` (`<leader>lv`) & `clangd_extensions.lua` (`<leader>lc` switch source/header + `nvim-cmp` score sorting).
+  - `trouble.lua` (`<leader>x*`) — workspace/buffer diagnostics, symbols, references, and quickfix drawer.
+- **Debugging, Testing & Build**:
+  - `dap.lua` (`<leader>d*`, `<F5>`/`<F10>`/`<F11>`/`<F12>`) — `nvim-dap` + `nvim-dap-view` + `nvim-dap-python` (`debugpy`) and native GDB DAP for C/C++.
+  - `neotest.lua` (`<leader>t*`) — inline test runner for Python (`pytest`) and C++ (`neotest-gtest`).
+  - `cmake_tools.lua` (`<leader>m*`) — CMake configure/build/run/debug + automatic `compile_commands.json` symlinking.
+- **AI Agent Integration**:
+  - `codecompanion.lua` (`<leader>cc` / `<leader>cA` / `<leader>ci`) — native Neovim chat & actions wired to Antigravity via `agy acp`.
+- **Treesitter**:
+  - `treesitter.lua` (`nvim-treesitter` `main` branch + native `vim.treesitter.start()`) & `treesitter_textobjects.lua` (`af`/`if`, `ac`/`ic`, `aa`/`ia`, `]m`/`[m`, `]]`/`[[`).
+- **Git, Dotfiles & Navigation**:
+  - `gitsigns.lua` (`]c`/`[c`, `<leader>gp`/`<leader>gs`/`<leader>gr`) & `diffview.lua` (`<leader>gd`/`<leader>gh`).
+  - `chezmoi.lua` (`<leader>fc`, `<leader>pc`, auto-apply on save in `~/.local/share/chezmoi`).
+  - `telescope.lua`, `neo-tree.lua`, `neovim_project.lua`, `whichkey.lua`.
+- **Obsidian & Markdown**:
+  - `obsidian.lua`, `render-markdown.lua` (also enabled for `codecompanion` buffers), and `after/ftplugin/markdown.lua`.
+- **Completion & UI**:
+  - `cmp.lua`, `autopairs.lua`, `comment.lua`, `colorscheme.lua`, `lualine.lua`, `alpha.lua`, `indentline.lua`, `illuminate.lua`, `todo_comments.lua`, `hardtime.lua`, `nerdy.lua`.
 
 ## Extending the Setup
-1. Create a new file in `lua/user/plugins/` that returns a Lazy spec for the plugin you want to add.
-2. Add `lazy_helper.spec "user.plugins.your_file"` to `init.lua`.
-3. Restart Neovim; Lazy.nvim will install the plugin on the next launch.
+1. Create a Lazy plugin spec in `lua/user/plugins/<name>.lua`.
+2. Register `lazy_helper.spec "user.plugins.<name>"` in `init.lua`.
+3. Update `HOTKEYS.md` (and `whichkey.lua` / `hardtime.lua` if adding keymaps or special filetypes).
+4. Sync changes with chezmoi (`chezmoi re-add ~/.config/nvim` and `chezmoi add <new-file>`).
 
-Example: `alpha.lua` follows this exact pattern and is enabled through `lazy_helper.spec "user.plugins.alpha"` in `init.lua`.
-
-## Repository Notes
-- `lazy-lock.json` records exact plugin commits to keep installations reproducible.
-- The `lua/user/lsp/.keep` placeholder keeps the directory tracked even if no explicit files are present yet.
-
-With this structure, most configuration changes can be isolated to a single Lua module, making it easier to maintain and reason about how the Neovim environment behaves.
+## Reference Docs
+- **`WORKFLOWS.md`** — step-by-step guides for Antigravity (`agy`), Python, Bash/Fish, C++/CMake, debugging, testing, and chezmoi.
+- **`HOTKEYS.md`** — task-oriented keybinding reference.
+- **`NVIM-0.12-NOTES.md`** — 0.12 migration history and remaining backlog.
+- **`GEMINI.md`** — workspace rules and conventions for Antigravity.
+- **`lazy-lock.json`** — pinned plugin commits for reproducible installs.
