@@ -43,33 +43,25 @@ Roughly ordered by value-for-effort.
 
 ### Quick cleanups (small, low risk)
 
-1. **`<S-h>` / `<S-l>` are mapped twice in `keymaps.lua`.** First to `:bprevious`/`:bnext`, later to
-   `^`/`g_`; the later mapping wins, so buffer cycling on those keys is dead. HOTKEYS.md lists both.
-   Pick one meaning (e.g. buffers on `[b`/`]b`, which 0.11+ ships by default).
-2. **Delete `lua/user/plugins/old_lspconfig.lua`.** Not imported anywhere and uses removed APIs
-   (`vim.lsp.with`, `wk.register`, `neodev`, `vim.diagnostic.goto_*`).
-3. **Delete or fix `lua/user/core/colorscheme.lua`.** Not required anywhere, and it runs
-   `colorscheme colorscheme tokyonight-night` (doubled word), which would fail.
-4. **README "What is still useful on Neovim 0.11?" section is stale.** It says which-key,
-   telescope, comment, none-ls aren't imported (they are) and that Neovim has no `gc` commenting
-   (it has since 0.10). Also has leftover `【F:…】` citation artifacts.
-5. **`mason.lua` header comment** describes mason-lspconfig v1 (setup hooks, `:LspInstall`).
+1. **~~`<S-h>` / `<S-l>` are mapped twice in `keymaps.lua`.~~ (Done 2026-11-25)** Removed dead
+   `:bprevious`/`:bnext` lines; `<S-h>`/`<S-l>` jump to line ends and built-in `[b`/`]b` cycle buffers.
+2. **~~Delete `lua/user/plugins/old_lspconfig.lua`.~~ (Done 2026-11-25)**
+3. **~~Delete or fix `lua/user/core/colorscheme.lua`.~~ (Done 2026-11-25)** Deleted unused file.
+4. **~~README "What is still useful on Neovim 0.11?" section is stale.~~ (Done 2026-11-25)** Refreshed `README.md`.
+5. **~~`mason.lua` header comment~~ (Done 2026-11-25)** Updated for mason-lspconfig v2 + mason-tool-installer.
 6. **`options.lua` + `cmp.lua` both set `completeopt`** (cmp's wins). Also `hidden`,
    `autoindent`, `ruler=false` re-set things that are already defaults or irrelevant.
-7. **lualine `extensions = { "fugitive" }`** — fugitive isn't installed.
+7. **~~lualine `extensions = { "fugitive" }`~~ (Done 2026-11-25)** Switched to `neo-tree`/`lazy`/`mason`/`trouble`, `ignore_focus = { "neo-tree" }`, and relative filename in `lualine_c`.
 
 ### LSP
 
-8. **Diagnostics config is gone.** `old_lspconfig.lua` had `vim.diagnostic.config` (sign icons,
-   rounded float, severity sort) but nothing loads it now, so you get the defaults. Port it:
-   use `signs = { text = { [vim.diagnostic.severity.ERROR] = icons.diagnostics.Error, ... } }`
-   (`:sign-define` no longer works in 0.12) and `jump = { on_jump = ... }` instead of `float`.
-9. **LSP keymaps.** 0.11+ ships defaults: `grn` rename, `gra` code action, `grr` references,
-   `gri` implementation, `grt` type definition, `grx` codelens, `gO` symbols, `K` hover,
-   `<C-s>` signature help, `[d`/`]d` diagnostics. The old `gd`, `gl`, `<leader>l*` set isn't
-   loaded anywhere — decide which to restore and add them to HOTKEYS.md.
-10. **`vim.o.winborder = "rounded"`** (0.11+) gives rounded borders to hover/signature/diagnostic
-    floats in one line. Check it doesn't double up on plugins that draw their own borders.
+8. **~~Diagnostics config is gone.~~ (Done 2026-11-25)** Restored `vim.diagnostic.config` in
+   `lspconfig.lua` with `signs.text`, `severity_sort`, `jump.on_jump` float, rounded float, and
+   `<leader>ld` virtual-text toggle; added `trouble.nvim` (`<leader>x*`).
+9. **~~LSP keymaps.~~ (Done 2026-11-25)** Restored buffer-local `gd`, `gD`, `gI`, `gl`, and
+   `<leader>l*` mappings on `LspAttach` in `lspconfig.lua` alongside 0.11+ defaults, and documented
+   them in `HOTKEYS.md`.
+10. **~~`vim.o.winborder = "rounded"`~~ (Done 2026-11-25)** Enabled in `options.lua`.
 11. **lua_ls library duplication.** `lspsettings/lua_ls.lua` adds all of `$VIMRUNTIME/lua` to
     `workspace.library` while lazydev.nvim already does this on demand — dropping it should make
     lua_ls start faster.
@@ -81,8 +73,8 @@ Roughly ordered by value-for-effort.
 
 13. **indent-blankline is pinned to a 2023 v2 commit.** Works today, but v3 (`ibl`) is the
     maintained version with a different config. Alternative: `snacks.indent`.
-14. **none-ls → conform.nvim (formatting) + nvim-lint (linting).** none-ls works, but conform is
-    the common modern choice and doesn't fake an LSP client.
+14. **~~none-ls → conform.nvim (formatting) + nvim-lint (linting).~~ (Done 2026-11-25)** Replaced
+    `none-ls.lua` with `conform.lua` (manual `<leader>lf` only, no format-on-save) and `lint.lua`.
 15. **Comment.nvim → built-in `gc`/`gcc`** (0.10+, already injection-aware). Keep
     nvim-ts-context-commentstring for JSX/Vue via its own autocmd (`enable_autocmd = true`).
 16. **nvim-cmp → blink.cmp, or built-in completion** (`'autocomplete'` + `vim.lsp.completion.enable`,
@@ -91,12 +83,24 @@ Roughly ordered by value-for-effort.
     handles `vim.ui.select`; check if nerdy still needs it.
 18. **Treesitter folding**: set `foldmethod = "expr"`, `foldexpr = "v:lua.vim.treesitter.foldexpr()"`
     (and maybe `foldlevel = 99`) — the old comment in `options.lua` now points at the right expr.
-19. **nvim-treesitter-textobjects (main branch)** for `af`/`if`/`ac`/`ic` style text objects.
+19. **~~nvim-treesitter-textobjects (main branch)~~ (Done 2026-11-25)** Added in `treesitter_textobjects.lua`
+    (`af`/`if`, `ac`/`ic`, `aa`/`ia`, `]m`/`[m`, `]]`/`[[`).
 20. **ui2** (experimental in 0.12): `require('vim._core.ui2').enable()` replaces the message area,
     removes "Press ENTER" prompts, highlights the cmdline as you type. Could make nvim-notify
     unnecessary. Try once it's no longer experimental.
 21. **`vim.pack`** — 0.12's built-in plugin manager. Not worth leaving lazy.nvim for right now
     (no lazy-loading, no lockfile UI), but worth watching.
+
+### Obsidian notes (added 2026-11-03 with obsidian.nvim + render-markdown.nvim)
+
+22a. **Hyprland rule for `<leader>no`.** `:Obsidian open` already jumps the app to the current
+     note; a window rule could always place Obsidian beside the terminal on the same workspace.
+22b. **Inline images.** 343 notes embed images. Alacritty has no Kitty graphics protocol, so
+     they can't show inside Neovim. Switching to Kitty/Ghostty/WezTerm would allow
+     `snacks.image`/`image.nvim` — a big change given the matugen-themed Alacritty setup.
+22c. **Templates are partly Obsidian-only.** Datacore blocks (233 notes) only render in the app.
+     `{{date}}`, `{{title}}`, `{{sunday:…}}`, `{{saturday:…}}` and moment `gggg`/`ww` work
+     (week numbers verified against all existing daily notes).
 
 ### Startup noise
 

@@ -46,7 +46,17 @@ function M.config()
     "markdown",
     "markdown_inline",
     "bash",
+    "fish",
     "python",
+    "c",
+    "cpp",
+    "cmake",
+    "make",
+    "diff",
+    "gitcommit",
+    "doxygen",
+    "printf",
+    "requirements",
     "vue",
     "typescript",
     "tsx",
@@ -60,7 +70,7 @@ function M.config()
     "regex",
     "vim",
     "vimdoc",
-    -- add: "go","rust","cpp" ...
+    "latex", -- math blocks in notes (render-markdown.nvim)
   }
 
   -- Heuristic: disable Treesitter on very large files to keep things snappy.

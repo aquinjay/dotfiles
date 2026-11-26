@@ -42,6 +42,7 @@ return {
     projects = {
       vim.fn.expand("~/projects/*"),
       vim.fn.expand("~/.config/*"),
+      vim.fn.expand("~/.local/share/chezmoi"),
       -- add more: vim.fn.expand("~/work/*"),
     },
 

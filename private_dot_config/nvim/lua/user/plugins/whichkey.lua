@@ -66,13 +66,18 @@ function M.config()
     { "<leader>ah", "<cmd>-tabmove<CR>", desc = "Move tab left" },
     { "<leader>al", "<cmd>+tabmove<CR>", desc = "Move tab right" },
     { "<leader>b", group = "Buffers" },
+    { "<leader>c", group = "Agent / Context", mode = { "n", "v" } },
+    { "<leader>d", group = "Debug", mode = { "n", "v" } },
     { "<leader>f", group = "Find" },
-    { "<leader>g", group = "Git" },
-    { "<leader>l", group = "LSP" },
+    { "<leader>g", group = "Git", mode = { "n", "v" } },
+    { "<leader>l", group = "LSP", mode = { "n", "v" } },
+    { "<leader>m", group = "CMake / Build" },
+    { "<leader>n", group = "Notes (Obsidian)" },
     { "<leader>p", group = "Project" },
     { "<leader>pd", "<cmd>cd %:p:h<CR>", desc = "CD to buffer dir" },
     { "<leader>t", group = "Test" },
     { "<leader>T", group = "Treesitter" },
+    { "<leader>x", group = "Diagnostics (Trouble)" },
   }, { mode = "n" })
 end
 
